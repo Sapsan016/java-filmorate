@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -15,17 +17,16 @@ import java.util.HashMap;
 @RestController
 @Slf4j
 @RequestMapping("users")
+@FieldDefaults(level= AccessLevel.PRIVATE)
 public class UserController {
 
-    private final HashMap<Integer, User> users = new HashMap<>();
+    final HashMap<Integer, User> users = new HashMap<>();
 
-    private int generatedId = 0;
+    int generatedId = 0;
 
     private int getGeneratedId() {
         return ++generatedId;
     }
-
-
     @GetMapping()
     public ArrayList<User> getAllUsers() {                                          //Получаем список всех пользователей
         return new ArrayList<>(users.values());

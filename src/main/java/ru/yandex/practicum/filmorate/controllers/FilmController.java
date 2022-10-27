@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -13,10 +15,11 @@ import java.util.HashMap;
 @RestController
 @Slf4j
 @RequestMapping("films")
+@FieldDefaults(level= AccessLevel.PRIVATE)
 public class FilmController {
 
-    private final HashMap<Integer, Film> films = new HashMap<>();
-    private int generatedId = 0;
+    final HashMap<Integer, Film> films = new HashMap<>();
+    int generatedId = 0;
 
     private int getGeneratedId(){
         return ++generatedId;
