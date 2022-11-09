@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("films")
+@RequestMapping("/films")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilmController {
 

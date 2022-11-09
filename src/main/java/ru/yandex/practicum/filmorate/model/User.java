@@ -28,5 +28,5 @@ public class User {
     @NotNull                         //Проверка на заполнение даты рождения
     LocalDate birthday;
 
-    Set<Integer> friendsIds;
+    Set<Integer> friendsIds = new HashSet<>();
 }

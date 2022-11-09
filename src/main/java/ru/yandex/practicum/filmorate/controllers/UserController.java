@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("users")
+@RequestMapping("/users")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
 

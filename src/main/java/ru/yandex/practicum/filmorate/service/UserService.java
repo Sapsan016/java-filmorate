@@ -24,18 +24,28 @@ public class UserService {
 
     public void addFriend(int userId, int friendId) {                                              //добавление в друзья
        User user = userStorage.getUserById(userId);
-       if(user == null || friendId == 0){
+       User friend = userStorage.getUserById(friendId);
+       if(user == null || friend == null){
+           log.error("User not found");
            throw new UserNotFoundException("User not found");
        }
-       user.getFriendsIds().add(friendId);
+       user.getFriendsIds().add(friendId);                                  //Добавляем Id пользователей в списки друзей
+       friend.getFriendsIds().add(userId);
+       log.info("Users with Id = " + userId + " and Id = " + friendId + " added as friends");
+
     }
 
     public void removeFriend(int userId, int friendId) {                                            //удаление из друзей
         User user = userStorage.getUserById(userId);
-        if(user == null || friendId == 0){
+        User friend = userStorage.getUserById(friendId);
+        if(user == null || friend == null){
+            log.error("User not found");
             throw new UserNotFoundException("User not found");
+
         }
-        user.getFriendsIds().remove(friendId);
+        user.getFriendsIds().remove(friendId);                         //Удаляем Id пользователей в обоих списках друзей
+        friend.getFriendsIds().remove(userId);
+        log.info("Users with Id = " + userId + " and Id = " + friendId + " not friends anymore");
 
     }
     public List<User> getFriendsList(int userId){                                     //вывод списка друзей пользователя
@@ -47,6 +57,7 @@ public class UserService {
                 .stream()
                 .map(userStorage::getUserById)
                 .collect(Collectors.toList());
+
     }
 
     public List<User> getCommonFriendsList(int userId, int anotherUserId){                   //вывод списка общих друзей
