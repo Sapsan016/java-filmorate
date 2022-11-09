@@ -3,71 +3,65 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping("users")
-@FieldDefaults(level= AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
 
-    final HashMap<Integer, User> users = new HashMap<>();
+    final UserStorage inMemoryUserStorage;
 
-    int generatedId = 0;
+    final UserService userService;
 
-    private int getGeneratedId() {
-        return ++generatedId;
+    @Autowired
+    public UserController(UserStorage inMemoryUserStorage, UserService userService) {
+        this.inMemoryUserStorage = inMemoryUserStorage;
+        this.userService = userService;
     }
+
     @GetMapping()
-    public ArrayList<User> getAllUsers() {                                          //Получаем список всех пользователей
-        return new ArrayList<>(users.values());
+    public ArrayList<User> getAllUsers() {                               //Запрос на получение списка всех пользователей
+        return inMemoryUserStorage.getAllUsers();
     }
-
-    @PutMapping()
-    public User updateUser(@Valid @RequestBody User user) throws ValidationException {          //Обновляем пользователя
-        if (!users.containsKey(user.getId())) {
-            throw new ValidationException("The user hasn't been created");            //Валидируем создание пользователя
-        }
-        if (validateUser(user)) {                                         //Если пользователь прошел валидацию обновляем
-            users.put(user.getId(), user);
-            return user;
-        } else {
-            throw new ValidationException("Validation failed");
-        }
+    @GetMapping("/{id}")                                                     //запрос на получение пользователя по Id
+    public User getUserById(@PathVariable("id") int id){
+        return inMemoryUserStorage.getUserById(id);
+    }
+    @PutMapping()                                                                 //Запрос на обновление пользователя
+    public User updateUser(@Valid @RequestBody User user) throws ValidationException {
+        return inMemoryUserStorage.updateUser(user);
     }
 
     @PostMapping()
-    public User createUser(@Valid @RequestBody User user) {                                       //Создаем пользователя
-        if (validateUser(user)) {                                         //Если пользователь прошел валидацию добавляем
-            user.setId(getGeneratedId());
-            users.put(user.getId(), user);
-            return user;
-        } else {
-            throw new ValidationException("Validation failed");
-        }
+    public User createUser(@Valid @RequestBody User user) {                            //Запрос на создание пользователя
+        return inMemoryUserStorage.createUser(user);
     }
 
-    private boolean validateUser(User user) {                                                   //Валидация пользователя
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); //Форматтер
+    @PutMapping("/{id}/friends/{friendId}")                                           //запрос на добавление в друзья
+    public void addFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
+        userService.addFriend(userId,friendId);
 
-        LocalDate birthdayDate = LocalDate.parse(user.getBirthday(), formatter);
-        LocalDateTime birthdayDateTime = LocalDateTime.of(birthdayDate, LocalDateTime.now().toLocalTime());
-
-        if (user.getName() == null || user.getName().isBlank()) {  //Если имя не заполнено, то использем логин для имени
-            user.setName(user.getLogin());
-        }
-        if (birthdayDateTime.isAfter(LocalDateTime.now())) {                                   //Валидация даты рождения
-            throw new ValidationException("Invalid birthday");
-        }
-        return true;
+    }
+    @DeleteMapping("/{id}/friends/{friendId}")                                         //запрос на удаление из друзей
+    public void removeFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
+        userService.removeFriend(userId,friendId);
+    }
+    @GetMapping("/{id}/friends")                                             //Запрос на получение списка всех друзей
+    public List<User> getFriendsList(@PathVariable("id") int userId) {
+        return userService.getFriendsList(userId);
+    }
+    @GetMapping("/{id}/friends/common/{otherId}")                           //запрос на получение списка общих друзей
+    public List<User> getCommonFriendsList(@PathVariable("id") int userId, @PathVariable("otherId") int otherId) {
+        return userService.getCommonFriendsList(userId,otherId);
     }
 }

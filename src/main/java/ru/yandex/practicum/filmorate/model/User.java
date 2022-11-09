@@ -8,6 +8,9 @@ import lombok.experimental.FieldDefaults;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +25,8 @@ public class User {
     @NotBlank                         //Проверка на заполнение логина
     @NotNull
     String login;
-    @NotBlank                         //Проверка на заполнение даты рождения
-    @NotNull
-    String birthday;
+    @NotNull                         //Проверка на заполнение даты рождения
+    LocalDate birthday;
+
+    Set<Integer> friendsIds;
 }
