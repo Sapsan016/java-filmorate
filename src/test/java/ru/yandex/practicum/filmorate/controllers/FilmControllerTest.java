@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -31,12 +32,10 @@ class FilmControllerTest {
     FilmController controller;
     FilmStorage inMemoryFilmStorage;
 
-    FilmService filmService;
-
     @BeforeEach
     void setUp() {
         inMemoryFilmStorage = new InMemoryFilmStorage();
-        controller = new FilmController(inMemoryFilmStorage, filmService);
+        controller = new FilmController(new FilmService(inMemoryFilmStorage));
     }
 
     @Test
@@ -91,11 +90,11 @@ class FilmControllerTest {
     }
 
     @Test
-    void shouldThrowNotAdded() {                                     //Должен выбрасывать ошибку "Фильм не был добавлен"
+    void shouldThrowNotAdded() {                                    //Должен выбрасывать ошибку "Фильм не был добавлен"
         try {
             controller.updateFilm(testFilm1);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("The film hasn't been added", e.getMessage());
+        } catch (FilmNotFoundException e) {
+            Assertions.assertEquals("The film with Id= 0 was not found", e.getMessage());
         }
     }
 }

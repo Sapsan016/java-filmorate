@@ -20,5 +20,5 @@ public interface FilmStorage {
 
     boolean validateFilm(Film film);
 
-
+    void removeFilmById(int id);
 }

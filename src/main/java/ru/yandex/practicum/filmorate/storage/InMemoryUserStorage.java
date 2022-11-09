@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -14,17 +13,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
 public class InMemoryUserStorage implements UserStorage {
-    @Autowired
-    public InMemoryUserStorage() {
-
-    }
-
     int generatedId = 0;
     final HashMap<Integer, User> users = new HashMap<>();
 
@@ -35,7 +30,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUserById(int id) {                                                      //Получаем пользователя по id
-        if(!users.containsKey(id)){                                                     //проверяем наличие пользовтеля
+        if (!users.containsKey(id)) {                                                     //проверяем наличие пользовтеля
             log.error("User not found");
             throw new UserNotFoundException("User with Id" + id + "not found");
         }
@@ -53,6 +48,7 @@ public class InMemoryUserStorage implements UserStorage {
             user.setId(getGeneratedId());                                 //Создаем Id и пустой список друзей
             user.setFriendsIds(new HashSet<>());
             users.put(user.getId(), user);
+            log.info("User with Id = " + user.getId() + " was created");
             return user;
         } else {
             log.error("Validation failed");
@@ -63,16 +59,30 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(@Valid @RequestBody User user) throws ValidationException {          //Обновляем пользователя
         if (!users.containsKey(user.getId())) {
-            log.error("User not found");
-            throw new UserNotFoundException("User with Id" + user.getId() + "not found");  //проверяем наличие пользователя
+            log.error("The user was not found");
+            throw new UserNotFoundException("The user with Id= " + user.getId() + " was not found");  //проверяем наличие пользователя
         }
         if (validateUser(user)) {                                         //Если пользователь прошел валидацию обновляем
+            Set<Integer> temp = users.get(user.getId()).getFriendsIds(); //Сохраняем список друзей перед обновлением
+            user.setFriendsIds(temp);
             users.put(user.getId(), user);
+
+            log.info("The user with Id= " + user.getId() + " was updated");
             return user;
         } else {
             log.error("Validation failed");
             throw new ValidationException("Validation failed");
         }
+    }
+
+    @Override
+    public void deleteUserById(int id) {                                                         //Удаляем пользователя
+        if (!users.containsKey(id)) {
+            log.error("User not found");
+            throw new UserNotFoundException("User with Id" + id + " was not found");  //проверяем наличие пользователя
+        }
+        users.remove(id);
+        log.info("User with Id" + id + " was removed");
     }
 
     @Override

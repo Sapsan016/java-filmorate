@@ -21,4 +21,6 @@ public interface UserStorage {
     User updateUser(@Valid @RequestBody User user) throws ValidationException;                  //Обновляем пользователя
 
     boolean validateUser(User user);
+
+    void deleteUserById(int id);
 }

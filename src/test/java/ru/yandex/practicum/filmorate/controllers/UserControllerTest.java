@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -11,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 class UserControllerTest {
@@ -19,7 +19,6 @@ class UserControllerTest {
     UserController controller;
     InMemoryUserStorage inMemoryUserStorage;
 
-    UserService userService;
     User testUser1 = new User(0, "user1@yandex.ru", "User number one",
             "user1", LocalDate.of(1984, 2, 14),new HashSet<>());
     User testUser2 = new User(0, "", "This is the test user without email",
@@ -37,8 +36,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         inMemoryUserStorage = new InMemoryUserStorage();
-        controller = new UserController(inMemoryUserStorage,
-                new UserService(inMemoryUserStorage));
+        controller =  new UserController(new UserService(inMemoryUserStorage));
     }
 
     @Test
@@ -97,11 +95,11 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldThrowNotCreated() {                              //Должен выбрасывать ошибку "Пользователь не был создан"
+    void shouldThrowNotCreated() {                              //Должен выбрасывать ошибку "Пользователь не найден"
         try {
             controller.updateUser(testUser1);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("The user hasn't been created", e.getMessage());
+        } catch (UserNotFoundException e) {
+            Assertions.assertEquals("The user with Id= 0 was not found", e.getMessage());
         }
     }
     @Test

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,34 +17,36 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilmController {
 
-    final FilmStorage inMemoryFilmStorage;
 
     final FilmService filmService;
     @Autowired
-    public FilmController(FilmStorage inMemoryFilmStorage, FilmService filmService) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping()
     public ArrayList<Film> getAllFilms() {                                     //Запрос на получение списка всех фильмов
-        return inMemoryFilmStorage.getAllFilms();
+        return filmService.getAllFilms();
     }
 
     @GetMapping("/{id}")                                                           //запрос на получение фильма по Id
     public Film getFilmById(@PathVariable("id") int id){
-        return inMemoryFilmStorage.getFilmById(id);
+        return filmService.getFilmById(id);
+    }
+    @PostMapping()
+    public Film addFilm(@RequestBody Film film) {                                         //Запрос на добавление фильма
+        return filmService.addFilm(film);
     }
 
     @PutMapping()
     public Film updateFilm(@RequestBody Film film) throws ValidationException {            //Запрос на обновление фильма
-        return inMemoryFilmStorage.updateFilm(film);
+        return filmService.updateFilm(film);
+    }
+    @DeleteMapping("/{id}")                                                               //запрос на удаление фильма
+    public void removeFilmById(@PathVariable("id") int id){
+        filmService.removeFilmById(id);
     }
 
-    @PostMapping()
-    public Film addFilm(@RequestBody Film film) {                                         //Запрос на добавление фильма
-        return inMemoryFilmStorage.addFilm(film);
-    }
     @PutMapping("/{id}/like/{userId}")                                                  //Запрос на добавление лайка
     public void addLike(@PathVariable("id") int filmId, @PathVariable("userId") int userId){
         filmService.addLike(filmId,userId);

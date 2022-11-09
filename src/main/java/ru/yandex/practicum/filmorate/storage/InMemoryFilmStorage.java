@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -45,6 +46,7 @@ public class InMemoryFilmStorage implements FilmStorage{
             film.setId(getGeneratedId());                                         //Добавляем Id и пустой список лайков
             film.setLikes(new HashSet<>());
             films.put(film.getId(), film);
+            log.info("The film with Id= " + film.getId() + " was added");
             return film;
         } else {
             log.error("Validation failed");
@@ -54,16 +56,28 @@ public class InMemoryFilmStorage implements FilmStorage{
     @Override
     public Film updateFilm(@RequestBody Film film) throws ValidationException {                        //Обновляем фильм
         if (!films.containsKey(film.getId())) {
-            log.error("Film not found");
-            throw new FilmNotFoundException("Film with Id" + film.getId() + "not found");    //Проверяем создание фильма
+            log.error("The film was not found");
+            throw new FilmNotFoundException("The film with Id= " + film.getId() + " was not found");    //Проверяем создание фильма
         }
         if(validateFilm(film)) {                                                 //Если фильм прошел валидацию обновляем
+            Set<Integer> temp = films.get(film.getId()).getLikes();          //Сохраняем список лайков перед обновлением
+            film.setLikes(temp);
             films.put(film.getId(),film);
+            log.info("The film with Id= " + film.getId() + " was updated");
             return film;
         } else {
             log.error("Validation failed");
             throw new ValidationException("Validation failed");
         }
+    }
+    @Override
+    public void removeFilmById(int id) {
+        if (!films.containsKey(id)) {
+            log.error("The film was not found");
+            throw new FilmNotFoundException("The film with Id= " + id + "not found");    //Проверяем создание фильма
+        }
+        films.remove(id);
+        log.info("The film with Id= " + id + " was removed");
     }
 
     @Override
