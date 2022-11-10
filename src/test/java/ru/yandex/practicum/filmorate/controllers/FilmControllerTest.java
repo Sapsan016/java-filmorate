@@ -2,31 +2,40 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 class FilmControllerTest {
 
     Film testFilm1 = new Film(0, "Test film one", "This is the test film number one",
-            "2000-01-01", 200);
+            LocalDate.of(2000,1,1), 200, new HashSet<>());
     Film testFilm2 = new Film(0, "", "This is the test film without name",
-            "2000-01-01", 200);
+            LocalDate.of(2000,1,1), 200, new HashSet<>());
     Film testFilm3 = new Film(0, "Test film three", "This is the test film with invalid description               " +
             "                                                                                                       " +
             "                                                                                                        ",
-            "2000-01-01", 200);
+            LocalDate.of(2000,1,1), 200, new HashSet<>());
     Film testFilm4 = new Film(0, "Test film four", "This is the test film with invalid date of release",
-            "1895-11-10", 200);
+            LocalDate.of(1895,11,10), 200, new HashSet<>());
     Film testFilm5 = new Film(0, "Test film five", "This is the test film with invalid duration",
-            "2000-01-01", -1);
+            LocalDate.of(2000,1,1), -1, new HashSet<>());
 
 
     FilmController controller;
+    FilmStorage inMemoryFilmStorage;
 
     @BeforeEach
     void setUp() {
-        controller = new FilmController();
+        inMemoryFilmStorage = new InMemoryFilmStorage();
+        controller = new FilmController(new FilmService(inMemoryFilmStorage));
     }
 
     @Test
@@ -49,7 +58,7 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm2);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid name", e.getMessage());
+            Assertions.assertEquals("Неверное имя", e.getMessage());
         }
     }
 
@@ -58,7 +67,7 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm3);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid description", e.getMessage());
+            Assertions.assertEquals("Неверное описание", e.getMessage());
         }
     }
 
@@ -67,7 +76,7 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm4);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid date of release", e.getMessage());
+            Assertions.assertEquals("Неверная дата выхода", e.getMessage());
         }
     }
 
@@ -76,16 +85,16 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm5);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid duration", e.getMessage());
+            Assertions.assertEquals("Неверная продолжительность", e.getMessage());
         }
     }
 
     @Test
-    void shouldThrowNotAdded() {                                     //Должен выбрасывать ошибку "Фильм не был добавлен"
+    void shouldThrowNotAdded() {                                    //Должен выбрасывать ошибку "Фильм не найден"
         try {
             controller.updateFilm(testFilm1);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("The film hasn't been added", e.getMessage());
+        } catch (FilmNotFoundException e) {
+            Assertions.assertEquals("Фильм с Id= 0 не найден", e.getMessage());
         }
     }
 }

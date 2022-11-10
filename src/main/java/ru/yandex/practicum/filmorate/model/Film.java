@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -12,6 +14,7 @@ public class Film {
     int id;
     String name;
     String description;
-    String releaseDate;
+    LocalDate releaseDate;
     int duration;
+    Set<Integer> likes;
 }
