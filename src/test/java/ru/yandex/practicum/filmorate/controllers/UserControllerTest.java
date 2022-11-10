@@ -90,7 +90,7 @@ class UserControllerTest {
         try {
             controller.createUser(testUser5);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid birthday", e.getMessage());
+            Assertions.assertEquals("Неверная дата рождения", e.getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ class UserControllerTest {
         try {
             controller.updateUser(testUser1);
         } catch (UserNotFoundException e) {
-            Assertions.assertEquals("The user with Id= 0 was not found", e.getMessage());
+            Assertions.assertEquals("Пользователь с Id= 0 не найден", e.getMessage());
         }
     }
     @Test

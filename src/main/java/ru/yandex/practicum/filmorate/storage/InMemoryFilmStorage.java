@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,10 +17,11 @@ import java.util.Set;
 
 @Component
 @Slf4j
-@FieldDefaults(level= AccessLevel.PRIVATE)
+@FieldDefaults(level= AccessLevel.PRIVATE, makeFinal=true)
 
 public class InMemoryFilmStorage implements FilmStorage{
-    final HashMap<Integer, Film> films = new HashMap<>();
+    HashMap<Integer, Film> films = new HashMap<>();
+    @NonFinal
     int generatedId = 0;
 
     @Override
@@ -30,8 +32,8 @@ public class InMemoryFilmStorage implements FilmStorage{
     @Override
     public Film getFilmById(int id) {                                                           //Возвращаем фильм по Id
         if(!films.containsKey(id)){                                                           //проверяем наличие фильма
-            log.error("Film not found");
-            throw new FilmNotFoundException("Film with Id" + id + "not found");
+            log.error("Фильм не найден");
+            throw new FilmNotFoundException("Фильм с Id=" + id + " не найден");
         }
         return films.get(id);
     }
@@ -46,38 +48,38 @@ public class InMemoryFilmStorage implements FilmStorage{
             film.setId(getGeneratedId());                                         //Добавляем Id и пустой список лайков
             film.setLikes(new HashSet<>());
             films.put(film.getId(), film);
-            log.info("The film with Id= " + film.getId() + " was added");
+            log.info("Фильм с Id= " + film.getId() + " не найден");
             return film;
         } else {
-            log.error("Validation failed");
-            throw new ValidationException("Validation failed");
+            log.error("Не прошла валидация");
+            throw new ValidationException("Не прошла валидация");
         }
     }
     @Override
     public Film updateFilm(@RequestBody Film film) throws ValidationException {                        //Обновляем фильм
         if (!films.containsKey(film.getId())) {
-            log.error("The film was not found");
-            throw new FilmNotFoundException("The film with Id= " + film.getId() + " was not found");    //Проверяем создание фильма
+            log.error("Фильм не найден");
+            throw new FilmNotFoundException("Фильм с Id= " + film.getId() + " не найден");    //Проверяем создание фильма
         }
         if(validateFilm(film)) {                                                 //Если фильм прошел валидацию обновляем
             Set<Integer> temp = films.get(film.getId()).getLikes();          //Сохраняем список лайков перед обновлением
             film.setLikes(temp);
             films.put(film.getId(),film);
-            log.info("The film with Id= " + film.getId() + " was updated");
+            log.info("Фильм с Id= " + film.getId() + " обновлен");
             return film;
         } else {
-            log.error("Validation failed");
-            throw new ValidationException("Validation failed");
+            log.error("Не прошла валидация");
+            throw new ValidationException("Не прошла валидация");
         }
     }
     @Override
     public void removeFilmById(int id) {
         if (!films.containsKey(id)) {
-            log.error("The film was not found");
-            throw new FilmNotFoundException("The film with Id= " + id + "not found");    //Проверяем создание фильма
+            log.error("Фильм не найден");
+            throw new FilmNotFoundException("Фильм с Id= " + id + " не найден");    //Проверяем создание фильма
         }
         films.remove(id);
-        log.info("The film with Id= " + id + " was removed");
+        log.info("Фильм с Id= " + id + " удален");
     }
 
     @Override
@@ -85,20 +87,20 @@ public class InMemoryFilmStorage implements FilmStorage{
         LocalDate firstFilm = LocalDate.of(1895,12,28);                       //День рождения кино
 
         if (film.getName() == null || film.getName().isBlank()) {                            //Валидация названия фильма
-            log.error("Invalid name");
-            throw new ValidationException("Invalid name");
+            log.error("Неверное имя");
+            throw new ValidationException("Неверное имя");
         }
         if (film.getDescription().length() > 200) {                                                 //Валидация описания
-            log.error("Invalid description");
-            throw new ValidationException("Invalid description");
+            log.error("Неверное описание");
+            throw new ValidationException("Неверное описание");
         }
         if (film.getReleaseDate().isBefore(firstFilm)) {                                  //Валидация даты выхода фильма
-            log.error("Invalid name date of release");
-            throw new ValidationException("Invalid date of release");
+            log.error("Неверная дата выхода");
+            throw new ValidationException("Неверная дата выхода");
         }
         if (film.getDuration() < 0) {                                               //Валидация продолжительности фильма
-            log.error("Invalid duration");
-            throw new ValidationException("Invalid duration");
+            log.error("Неверная продолжительность");
+            throw new ValidationException("Неверная продолжительность");
         }
         return true;
     }

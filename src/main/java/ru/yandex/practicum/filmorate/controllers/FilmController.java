@@ -17,7 +17,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilmController {
 
-
     final FilmService filmService;
     @Autowired
     public FilmController(FilmService filmService) {

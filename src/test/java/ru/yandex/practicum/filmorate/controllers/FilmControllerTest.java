@@ -58,7 +58,7 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm2);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid name", e.getMessage());
+            Assertions.assertEquals("Неверное имя", e.getMessage());
         }
     }
 
@@ -67,7 +67,7 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm3);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid description", e.getMessage());
+            Assertions.assertEquals("Неверное описание", e.getMessage());
         }
     }
 
@@ -76,7 +76,7 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm4);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid date of release", e.getMessage());
+            Assertions.assertEquals("Неверная дата выхода", e.getMessage());
         }
     }
 
@@ -85,16 +85,16 @@ class FilmControllerTest {
         try {
             controller.addFilm(testFilm5);
         } catch (ValidationException e) {
-            Assertions.assertEquals("Invalid duration", e.getMessage());
+            Assertions.assertEquals("Неверная продолжительность", e.getMessage());
         }
     }
 
     @Test
-    void shouldThrowNotAdded() {                                    //Должен выбрасывать ошибку "Фильм не был добавлен"
+    void shouldThrowNotAdded() {                                    //Должен выбрасывать ошибку "Фильм не найден"
         try {
             controller.updateFilm(testFilm1);
         } catch (FilmNotFoundException e) {
-            Assertions.assertEquals("The film with Id= 0 was not found", e.getMessage());
+            Assertions.assertEquals("Фильм с Id= 0 не найден", e.getMessage());
         }
     }
 }

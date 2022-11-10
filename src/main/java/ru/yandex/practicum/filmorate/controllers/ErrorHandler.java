@@ -34,7 +34,7 @@ public class ErrorHandler {
     @ExceptionHandler                                                                         //Обработка прочих ошибок
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse throwableExceptionResponse (final Throwable e){
-        return new ErrorResponse("Unexpected error!!!"
+        return new ErrorResponse("Возникла непредвиденная ошибка!!!"
         );
     }
 }

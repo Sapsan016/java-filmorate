@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal=true)
 
 public class FilmService {
-    final FilmStorage filmStorage;
+    FilmStorage filmStorage;
 
     @Autowired
     public FilmService(FilmStorage filmStorage) {
@@ -46,8 +46,8 @@ public class FilmService {
     public void addLike(int filmId, int userId){                                                      //Добавление лайка
         Film film = filmStorage.getFilmById(filmId);
         if(film == null || userId <= 0){
-            log.error("The film or the user was not found");
-            throw new FilmNotFoundException("The film or the user was not found");
+            log.error("Фильм или пользователь не найдены");
+            throw new FilmNotFoundException("Фильм или пользователь не найдены");
         }
         film.getLikes().add(userId);
     }
@@ -55,8 +55,8 @@ public class FilmService {
     public void  removeLike(int filmId, int userId) {                                                   //Удаление лайка
         Film film = filmStorage.getFilmById(filmId);
         if(film == null || userId <= 0 ) {
-            log.error("The film or the user was not found");
-            throw new FilmNotFoundException("The film or the user was not found");
+            log.error("Фильм или пользователь не найдены");
+            throw new FilmNotFoundException("Фильм или пользователь не найдены");
         }
         film.getLikes().remove(userId);
     }
@@ -67,7 +67,7 @@ public class FilmService {
                 .sorted((film1, film2) -> film2.getLikes().size() - film1.getLikes().size())//сортируем фильмы по количеству лайков
                 .limit(count)
                 .collect(Collectors.toList());
-        log.info("The list of most popular films: " + popularFilms);
+        log.info("Список самых популярных фильмов: " + popularFilms);
         return popularFilms;
     }
 }
