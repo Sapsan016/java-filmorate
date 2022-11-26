@@ -1,6 +1,10 @@
 Репозиторий проекта Filmorate
 
-![](src/main/resources/FilmorateDB_diagramm.png)
+
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="src/main/resources/FilmorateDB_diagramm.png">
+    <img src="src/main/resources/FilmorateDB_diagramm.png">
+</picture>
 
 Примеры основных запросов
 
@@ -26,6 +30,6 @@ SELECT film_name FROM users WHERE id = 1;
 INSERT INTO film_likes (film_id, user_id)
 VALUES (1, 2);
 
-SELECT COOUNT(user_id) FROM film_likes WHERE film_id = 1;
+SELECT COUNT(user_id) FROM film_likes WHERE film_id = 1;
 
 DELETE FROM films WHERE id = 1;
