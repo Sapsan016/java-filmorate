@@ -1,6 +1,6 @@
 Репозиторий проекта Filmorate
 
-![](../../Downloads/FilmorateDB_diagramm.png)
+![](src/main/resources/FilmorateDB_diagramm.png)
 
 Примеры основных запросов
 
