@@ -1,3 +1,4 @@
+
 # java-filmorate
 Template repository for Filmorate project.
 
@@ -29,3 +30,4 @@ VALUES (1, 2);
 SELECT COOUNT(user_id) FROM film_likes WHERE film_id = 1;
 
 DELETE FROM films WHERE id = 1;
+
