@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -16,5 +17,8 @@ public class Film {
     String description;
     LocalDate releaseDate;
     int duration;
-    Set<Integer> likes;
+    Set<Integer> likes;               //Список id пользователей поставивших лайк фильму
+    String rating;                    //Рейтинг фильма
+    List<String> genres;              //Жанры фильма
+
 }

@@ -20,18 +20,18 @@ class UserControllerTest {
     InMemoryUserStorage inMemoryUserStorage;
 
     User testUser1 = new User(0, "user1@yandex.ru", "User number one",
-            "user1", LocalDate.of(1984, 2, 14),new HashSet<>());
+            "user1", LocalDate.of(1984, 2, 14),new HashSet<>(), false);
     User testUser2 = new User(0, "", "This is the test user without email",
-            "user2", LocalDate.of(1984, 2, 14), new HashSet<>());
+            "user2", LocalDate.of(1984, 2, 14), new HashSet<>(), false);
     User testUser3 = new User(0, "user3@yandex.ru", "This is the test user with invalid login",
-            " ", LocalDate.of(1984, 2, 14), new HashSet<>());
+            " ", LocalDate.of(1984, 2, 14), new HashSet<>(), false);
     User testUser4 = new User(0, "user4@yandex.ru", "", "user4",
-            LocalDate.of(1984, 2, 14), new HashSet<>());
+            LocalDate.of(1984, 2, 14), new HashSet<>(), false);
     User testUser5 = new User(0, "user5@yandex.ru", "This is the test user with invalid birthday",
-            "user5", LocalDate.now().plusDays(1), new HashSet<>());
+            "user5", LocalDate.now().plusDays(1), new HashSet<>(), false);
 
     User testUser6 = new User(0, "user6@yandex.ru", "User number six",
-            "user6", LocalDate.of(2000, 2, 14),new HashSet<>());
+            "user6", LocalDate.of(2000, 2, 14),new HashSet<>(), false);
 
     @BeforeEach
     void setUp() {

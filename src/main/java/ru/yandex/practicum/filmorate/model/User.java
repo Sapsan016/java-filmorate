@@ -28,4 +28,5 @@ public class User {
     LocalDate birthday;
 
     Set<Integer> friendsIds;                                                               //Поле для хранения Id друзей
+    boolean isConfirmed;                                                                   // Статус дружбы
 }

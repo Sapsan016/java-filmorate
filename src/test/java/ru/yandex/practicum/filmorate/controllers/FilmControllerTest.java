@@ -16,17 +16,17 @@ import java.util.HashSet;
 class FilmControllerTest {
 
     Film testFilm1 = new Film(0, "Test film one", "This is the test film number one",
-            LocalDate.of(2000,1,1), 200, new HashSet<>());
+            LocalDate.of(2000,1,1), 200, new HashSet<>(), "G", new ArrayList<>());
     Film testFilm2 = new Film(0, "", "This is the test film without name",
-            LocalDate.of(2000,1,1), 200, new HashSet<>());
+            LocalDate.of(2000,1,1), 200, new HashSet<>(), "G", new ArrayList<>());
     Film testFilm3 = new Film(0, "Test film three", "This is the test film with invalid description               " +
             "                                                                                                       " +
             "                                                                                                        ",
-            LocalDate.of(2000,1,1), 200, new HashSet<>());
+            LocalDate.of(2000,1,1), 200, new HashSet<>(), "G", new ArrayList<>());
     Film testFilm4 = new Film(0, "Test film four", "This is the test film with invalid date of release",
-            LocalDate.of(1895,11,10), 200, new HashSet<>());
+            LocalDate.of(1895,11,10), 200, new HashSet<>(), "G", new ArrayList<>());
     Film testFilm5 = new Film(0, "Test film five", "This is the test film with invalid duration",
-            LocalDate.of(2000,1,1), -1, new HashSet<>());
+            LocalDate.of(2000,1,1), -1, new HashSet<>(), "G", new ArrayList<>());
 
 
     FilmController controller;
