@@ -1,4 +1,4 @@
-create table FILMS
+create table IF NOT EXISTS FILMS
 (
     FILM_ID      INTEGER auto_increment,
     FILM_NAME    CHARACTER VARYING(50) not null,
@@ -10,7 +10,7 @@ create table FILMS
         primary key (FILM_ID)
 );
 
-create table USERS
+create table IF NOT EXISTS USERS
 (
     USER_ID      INTEGER auto_increment,
     USER_NAME    CHARACTER VARYING(30) not null,
@@ -21,7 +21,7 @@ create table USERS
         primary key (USER_ID)
 );
 
-create table GENRES
+create table IF NOT EXISTS GENRES
 (
     GENRE_ID      INTEGER auto_increment,
     GENRE_NAME    VARCHAR(10) not null,
@@ -31,7 +31,7 @@ create table GENRES
 
 
 
-create table FILMS_GENRE
+create table IF NOT EXISTS FILMS_GENRE
 (
     FILM_GENRE_ID INTEGER auto_increment,
     GENRE_ID      INTEGER not null,
@@ -45,7 +45,7 @@ create table FILMS_GENRE
         foreign key (GENRE_ID) references GENRES
 );
 
-create table FILM_LIKES
+create table IF NOT EXISTS FILM_LIKES
 (
     FILM_LIKE_ID INTEGER auto_increment,
     FILM_ID      INTEGER not null,
@@ -60,7 +60,7 @@ create table FILM_LIKES
             on update cascade on delete cascade
 );
 
-create table USER_FRIENDS
+create table IF NOT EXISTS USER_FRIENDS
 (
     USER_FRIEND_ID INTEGER auto_increment,
     USER_ID        INTEGER not null,
