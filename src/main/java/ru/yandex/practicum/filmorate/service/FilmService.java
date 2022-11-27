@@ -37,8 +37,8 @@ public class FilmService {
     public void addFilm(@RequestBody Film film) {                      //Передаем запрос на добавление фильмав в хранилище
         filmStorage.addFilm(film);
     }
-    public Film updateFilm(@RequestBody Film film) throws ValidationException { //Передаем запрос на обновление фильма в хранилище
-        return filmStorage.updateFilm(film);
+    public void updateFilm(@RequestBody Film film) throws ValidationException { //Передаем запрос на обновление фильма в хранилище
+        filmStorage.updateFilm(film);
     }
     public void removeFilmById(int id) {
         filmStorage.removeFilmById(id);

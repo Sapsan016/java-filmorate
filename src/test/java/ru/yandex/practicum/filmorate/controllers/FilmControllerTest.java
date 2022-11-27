@@ -53,7 +53,8 @@ class FilmControllerTest {
     void updateFilm() {                                                                       //Должен обновиться фильм
         controller.addFilm(testFilm1);
         testFilm1.setName("Updated name");
-        Assertions.assertEquals(testFilm1, controller.updateFilm(testFilm1));
+        controller.updateFilm(testFilm1);
+        Assertions.assertEquals("Updated name", testFilm1.getName());
     }
 
     @Test

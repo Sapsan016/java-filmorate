@@ -57,7 +57,7 @@ public class InMemoryFilmStorage implements FilmStorage{
         }
     }
     @Override
-    public Film updateFilm(@RequestBody Film film) throws ValidationException {                        //Обновляем фильм
+    public void updateFilm(@RequestBody Film film) throws ValidationException {                        //Обновляем фильм
         if (!films.containsKey(film.getId())) {
             log.error("Фильм не найден");
             throw new FilmNotFoundException("Фильм с Id= " + film.getId() + " не найден");    //Проверяем создание фильма
@@ -67,7 +67,7 @@ public class InMemoryFilmStorage implements FilmStorage{
             film.setLikes(temp);
             films.put(film.getId(),film);
             log.info("Фильм с Id= " + film.getId() + " обновлен");
-            return film;
+
         } else {
             log.error("Не прошла валидация");
             throw new ValidationException("Не прошла валидация");

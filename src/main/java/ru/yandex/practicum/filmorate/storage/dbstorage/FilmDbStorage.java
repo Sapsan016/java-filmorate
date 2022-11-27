@@ -26,10 +26,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public int getGeneratedId() {
-        return 0;
-    }
-    @Override
     public void addFilm(Film film) {
         String sqlQuery = "insert into FILMS (FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION,RATING) " +
                 "values (?, ?, ?, ?)";
@@ -45,9 +41,9 @@ public class FilmDbStorage implements FilmStorage {
     public Film getFilmById(int id) {
         String sqlQuery = "select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING " +
                 "from FILMS where FILM_ID = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToEmployee, id);
+        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
     }
-    private Film mapRowToEmployee(ResultSet resultSet, int rowNum) throws SQLException {
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("FILM_ID"))
                 .name(resultSet.getString("FILM_NAME"))
@@ -55,20 +51,28 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
                 .duration(resultSet.getInt("DURATION"))
                 .rating(resultSet.getString("RATING"))
-
                 .build();
     }
 
     @Override
     public ArrayList<Film> getAllFilms() {
-        return null;
+        String sqlQuery = "select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING from FILMS";
+        return (ArrayList<Film>) jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
 
 
     @Override
-    public Film updateFilm(Film film) throws ValidationException {
-        return null;
+    public void updateFilm(Film film) throws ValidationException {
+        String sqlQuery = "update FILMS set " +
+                "FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?,  DURATION = ?, RATING = ?" +
+                "where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuery
+                ,jdbcTemplate.update(sqlQuery,
+                        film.getName(),
+                        film.getDescription(),
+                        film.getDuration(),
+                        film.getRating()));
     }
 
     @Override
@@ -78,6 +82,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeFilmById(int id) {
+        String sqlQuery = "delete from FILMS where FILM_ID = ?";
+        jdbcTemplate.update(sqlQuery, id);
 
     }
 }
