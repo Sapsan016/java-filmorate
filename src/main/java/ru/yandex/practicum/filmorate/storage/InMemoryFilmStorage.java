@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
+//@Primary
 @Component
 @Slf4j
 @FieldDefaults(level= AccessLevel.PRIVATE, makeFinal=true)
@@ -43,13 +44,13 @@ public class InMemoryFilmStorage implements FilmStorage{
         return new ArrayList<>(films.values());
     }
     @Override
-    public Film addFilm(@RequestBody Film film) {                                                    //Добавляем фильм
+    public void addFilm(@RequestBody Film film) {                                                    //Добавляем фильм
         if(validateFilm(film)) {                                               //Если фильм прошел валидацию добавляем
             film.setId(getGeneratedId());                                         //Добавляем Id и пустой список лайков
             film.setLikes(new HashSet<>());
             films.put(film.getId(), film);
             log.info("Фильм с Id= " + film.getId() + " не найден");
-            return film;
+            //return film;
         } else {
             log.error("Не прошла валидация");
             throw new ValidationException("Не прошла валидация");

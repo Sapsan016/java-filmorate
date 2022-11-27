@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     ArrayList<Film> getAllFilms();                                                      //Получаем список всех фильмов
 
-    Film addFilm(@RequestBody Film film);                                                     //Добавляем фильм
+    void addFilm(@RequestBody Film film);                                                     //Добавляем фильм
 
     Film updateFilm(@RequestBody Film film) throws ValidationException;                   //Обновляем фильм
 

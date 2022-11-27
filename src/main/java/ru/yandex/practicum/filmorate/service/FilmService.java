@@ -22,10 +22,11 @@ import java.util.stream.Collectors;
 public class FilmService {
     FilmStorage filmStorage;
 
+
     @Autowired
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
-        }
+           }
 
     public ArrayList<Film> getAllFilms() {                //Передаем запрос на получение списка всех фильмов в хранилище
         return filmStorage.getAllFilms();
@@ -33,8 +34,8 @@ public class FilmService {
     public Film getFilmById(@PathVariable("id") int id){               //Передаем запрос на получение фильма в хранилище
         return filmStorage.getFilmById(id);
     }
-    public Film addFilm(@RequestBody Film film) {                      //Передаем запрос на добавление фильмав в хранилище
-        return filmStorage.addFilm(film);
+    public void addFilm(@RequestBody Film film) {                      //Передаем запрос на добавление фильмав в хранилище
+        filmStorage.addFilm(film);
     }
     public Film updateFilm(@RequestBody Film film) throws ValidationException { //Передаем запрос на обновление фильма в хранилище
         return filmStorage.updateFilm(film);
