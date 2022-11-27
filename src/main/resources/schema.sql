@@ -21,6 +21,16 @@ create table USERS
         primary key (USER_ID)
 );
 
+create table GENRES
+(
+    GENRE_ID      INTEGER auto_increment,
+    GENRE_NAME    VARCHAR(10) not null,
+    constraint GENRE_PK
+        primary key (GENRE_ID)
+);
+
+
+
 create table FILMS_GENRE
 (
     FILM_GENRE_ID INTEGER auto_increment,
@@ -33,14 +43,6 @@ create table FILMS_GENRE
             on update cascade on delete cascade,
     constraint FILMS_GENRE_GENRES_GENRE_ID_FK
         foreign key (GENRE_ID) references GENRES
-);
-
-create table GENRES
-(
-    GENRE_ID      INTEGER auto_increment,
-    GENRE_NAME    VARCHAR(10) not null,
-    constraint GENRE_PK
-        primary key (GENRE_ID)
 );
 
 create table FILM_LIKES
@@ -73,3 +75,4 @@ create table USER_FRIENDS
         foreign key (FRIEND_ID) references USERS
             on update cascade on delete cascade
 );
+
