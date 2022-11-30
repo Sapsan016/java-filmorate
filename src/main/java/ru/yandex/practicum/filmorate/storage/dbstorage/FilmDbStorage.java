@@ -3,8 +3,11 @@ package ru.yandex.practicum.filmorate.storage.dbstorage;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -16,24 +19,35 @@ import java.util.ArrayList;
 
 @Repository
 @Slf4j
-@FieldDefaults(level= AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+//@Qualifier("filmStorage")
+@Primary
 
 public class FilmDbStorage implements FilmStorage {
-     JdbcTemplate jdbcTemplate;
+    JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public void addFilm(Film film) {
-        String sqlQuery = "insert into FILMS (FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION,RATING) " +
-                "values (?, ?, ?, ?)";
-        jdbcTemplate.update(sqlQuery,
-                film.getName(),
-                film.getDescription(),
-                film.getDuration(),
-                film.getRating());
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate) //Добавляем фильм в таблицу FILMS
+                .withTableName("FILMS")
+                .usingGeneratedKeyColumns("id");
+        int filmId = simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue(); //и сохраняем id
+
+        for (String genre : film.getGenres()) {                  //Добавляем в таблицу FILMS_GENRE список жанров фильма
+            String sqlQuery = "insert into FILMS_GENRE(GENRE_ID, FILM_ID) values (?, ?)";
+            jdbcTemplate.update(sqlQuery, genre, filmId);
+        }
+        if(!film.getLikes().isEmpty()) {            //Если список лайков фильма не пустой
+            for (Integer like : film.getLikes()) {  //Добавляем в таблицу FILM_LIKES список лайков фильма
+                String sqlQuery = "insert into FILM_LIKES(FILM_ID, USER_ID) values (?, ?)";
+                jdbcTemplate.update(sqlQuery, filmId, like);
+            }
+        }
     }
 
 
@@ -43,6 +57,7 @@ public class FilmDbStorage implements FilmStorage {
                 "from FILMS where FILM_ID = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
     }
+
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("FILM_ID"))
@@ -61,14 +76,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
-
     @Override
     public void updateFilm(Film film) throws ValidationException {
         String sqlQuery = "update FILMS set " +
                 "FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?,  DURATION = ?, RATING = ?" +
                 "where FILM_ID = ?";
         jdbcTemplate.update(sqlQuery
-                ,jdbcTemplate.update(sqlQuery,
+                , jdbcTemplate.update(sqlQuery,
                         film.getName(),
                         film.getDescription(),
                         film.getDuration(),
