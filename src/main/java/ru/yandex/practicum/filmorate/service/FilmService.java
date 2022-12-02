@@ -28,7 +28,7 @@ public class FilmService {
         this.filmStorage = filmStorage;
            }
 
-    public ArrayList<Film> getAllFilms() {                //Передаем запрос на получение списка всех фильмов в хранилище
+    public List<Film> getAllFilms() {                //Передаем запрос на получение списка всех фильмов в хранилище
         return filmStorage.getAllFilms();
     }
     public Film getFilmById(@PathVariable("id") int id){               //Передаем запрос на получение фильма в хранилище

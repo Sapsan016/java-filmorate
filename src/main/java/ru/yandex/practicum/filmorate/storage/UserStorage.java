@@ -7,12 +7,14 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public interface UserStorage {
 
     User getUserById(int id);
 
-    ArrayList<User> getAllUsers();                                                  //Получаем список всех пользователей
+    List<User> getAllUsers();                                                  //Получаем список всех пользователей
 
     User createUser(@Valid @RequestBody User user);                                               //Создаем пользователя
 

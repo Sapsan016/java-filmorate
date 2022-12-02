@@ -29,7 +29,7 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public ArrayList<User> getAllUsers() {          //Передаем запрос на получение списка всех пользователей в хранилище
+    public List<User> getAllUsers() {          //Передаем запрос на получение списка всех пользователей в хранилище
         return userStorage.getAllUsers();
     }
 

@@ -22,8 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -65,11 +65,10 @@ public class DBUserStorage implements UserStorage {
     }
 
     @Override
-    public ArrayList<User> getAllUsers() {                                          //Получаем список всех пользователей
+    public List<User> getAllUsers() {                                          //Получаем список всех пользователей
         String sqlQuery = "select USER_ID, EMAIL, USER_NAME, BIRTHDAY from USERS";
-        return (ArrayList<User>) jdbcTemplate.query(sqlQuery, this::mapRowToUser);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
-
 
 
     @Override
@@ -92,6 +91,7 @@ public class DBUserStorage implements UserStorage {
             log.error("Валидация не прошла");
             throw new ValidationException("Валидация не прошла");
         }
+        user.setFriendsIds(new HashSet<>());
         return user;
     }
 
@@ -147,6 +147,7 @@ public class DBUserStorage implements UserStorage {
                 .id(resultSet.getInt("USER_ID"))
                 .email(resultSet.getString("EMAIL"))
                 .name(resultSet.getString("USER_NAME"))
+                .login(resultSet.getString("LOGIN"))
                 .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
                 .friendsIds(new HashSet<>())
                 .build();

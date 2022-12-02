@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping()
-    public ArrayList<User> getAllUsers() {                               //Запрос на получение списка всех пользователей
+    public List<User> getAllUsers() {                               //Запрос на получение списка всех пользователей
         return userService.getAllUsers();
     }
 

@@ -24,7 +24,7 @@ public class FilmController {
     }
 
     @GetMapping()
-    public ArrayList<Film> getAllFilms() {                                     //Запрос на получение списка всех фильмов
+    public List<Film> getAllFilms() {                                     //Запрос на получение списка всех фильмов
         return filmService.getAllFilms();
     }
 

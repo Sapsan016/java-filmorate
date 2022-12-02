@@ -6,19 +6,18 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public interface FilmStorage {
-    default int getGeneratedId() {
-        return 0;
-    }
 
     Film getFilmById(int id);
 
-    ArrayList<Film> getAllFilms();                                                      //Получаем список всех фильмов
+    List<Film> getAllFilms();                                                      //Получаем список всех фильмов
 
-    void addFilm(@RequestBody Film film);                                                     //Добавляем фильм
+    Film addFilm(@RequestBody Film film);                                                     //Добавляем фильм
 
-    void updateFilm(@RequestBody Film film) throws ValidationException;                   //Обновляем фильм
+    Film updateFilm(@RequestBody Film film) throws ValidationException;                   //Обновляем фильм
 
     boolean validateFilm(Film film);
 
