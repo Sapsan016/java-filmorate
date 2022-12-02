@@ -37,7 +37,7 @@ public class UserService {
         return userStorage.getUserById(id);
     }
 
-    public User createUser(@Valid @RequestBody User user) {       //Передаем Запрос на создание пользователя в хранилище
+    public User createUser(@Valid @RequestBody User user) {       //Передаем запрос на создание пользователя в хранилище
         return userStorage.createUser(user);
     }
 

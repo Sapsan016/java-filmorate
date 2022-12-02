@@ -23,6 +23,3 @@ merge into MPA(MPA_ID,MPA_NAME)
     values (4, 'R');
 merge into MPA(MPA_ID,MPA_NAME)
     values (5, 'NC-17');
-
-
-

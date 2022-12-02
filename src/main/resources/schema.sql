@@ -1,3 +1,10 @@
+create table IF NOT EXISTS MPA
+(
+    MPA_ID   INTEGER               not null,
+    MPA_NAME CHARACTER VARYING(10) not null,
+    constraint MPA_PK
+        primary key (MPA_ID)
+);
 create table IF NOT EXISTS FILMS
 (
     FILM_ID      INTEGER auto_increment,
@@ -15,8 +22,8 @@ create table IF NOT EXISTS FILMS
 create table IF NOT EXISTS USERS
 (
     USER_ID      INTEGER auto_increment,
-    USER_NAME    CHARACTER VARYING(30),
     EMAIL        CHARACTER VARYING(20),
+    USER_NAME    CHARACTER VARYING(30),
     LOGIN       CHARACTER VARYING(10) not null,
     BIRTHDAY     DATE                  not null,
     constraint USERS_PK
@@ -56,24 +63,18 @@ create table IF NOT EXISTS FILM_LIKES
             on update cascade on delete cascade
 );
 
-create table IF NOT EXISTS USER_FRIENDS
+create table IF NOT EXISTS FRIENDS
 (
     USER_ID        INTEGER not null,
     FRIEND_ID      INTEGER not null,
     STATUS         BOOLEAN,
 
-    constraint USER_FRIENDS_USERS_USER_ID_FK
+    constraint FRIENDS_USERS_USER_ID_FK
         foreign key (USER_ID) references USERS
             on update cascade on delete cascade,
-    constraint USER_FRIENDS_USERS_USER_ID_FK_2
+    constraint FRIENDS_USERS_USER_ID_FK_2
         foreign key (FRIEND_ID) references USERS
             on update cascade on delete cascade
 );
-create table IF NOT EXISTS MPA
-(
-    MPA_ID   INTEGER               not null,
-    MPA_NAME CHARACTER VARYING(10) not null,
-    constraint MPA_PK
-        primary key (MPA_ID)
-);
+
 

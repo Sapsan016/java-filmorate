@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @FieldDefaults(level= AccessLevel.PRIVATE)
+@Builder
 public class User {
     int id;
     @NotBlank                                             //Проверка email на пустую строку, null и соответствие формату

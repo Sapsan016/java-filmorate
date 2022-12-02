@@ -94,16 +94,7 @@ public class FilmDbStorage implements FilmStorage {
                 .rating(resultSet.getString("RATING"))
                 .build();
     }
-    private Film mapRowToGenres(ResultSet resultSet, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(resultSet.getInt("FILM_ID"))
-                .name(resultSet.getString("FILM_NAME"))
-                .description(resultSet.getString("DESCRIPTION"))
-                .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
-                .duration(resultSet.getInt("DURATION"))
-                .rating(resultSet.getString("RATING"))
-                .build();
-    }
+
 
     @Override
     public ArrayList<Film> getAllFilms() {
