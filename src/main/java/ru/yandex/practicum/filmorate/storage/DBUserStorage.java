@@ -51,22 +51,22 @@ public class DBUserStorage implements UserStorage {
             throw new UserNotFoundException("Пользователь с Id" + id + " не найден");
         }
 
-//        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("select FRIEND_ID " +
-//                "from FRIENDS where USER_ID = ?");
-//        Set<Integer> friendsIds = new HashSet<>();
-//        if (friendsRows.next()) {
-//            friendsIds.add(
-//                    friendsRows.getInt("FRIEND_ID"));
-//        }
-//        if (!friendsIds.isEmpty()) {
-//            user.setFriendsIds(friendsIds);
-//        }
+        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("select FRIEND_ID " +
+                "from FRIENDS where USER_ID = ?");
+        Set<Integer> friendsIds = new HashSet<>();
+        if (friendsRows.next()) {
+            friendsIds.add(
+                    friendsRows.getInt("FRIEND_ID"));
+        }
+        if (!friendsIds.isEmpty()) {
+            user.setFriendsIds(friendsIds);
+        }
         return user;
     }
 
     @Override
     public List<User> getAllUsers() {                                          //Получаем список всех пользователей
-        String sqlQuery = "select USER_ID, EMAIL, USER_NAME, BIRTHDAY from USERS";
+        String sqlQuery = "select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY from USERS";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
