@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Email;
@@ -11,7 +9,8 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @FieldDefaults(level= AccessLevel.PRIVATE)
 public class User {
@@ -28,5 +27,5 @@ public class User {
     LocalDate birthday;
 
     Set<Integer> friendsIds;                                                               //Поле для хранения Id друзей
-    boolean isConfirmed;                                                                   // Статус дружбы
+
 }

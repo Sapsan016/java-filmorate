@@ -5,18 +5,20 @@ create table IF NOT EXISTS FILMS
     DESCRIPTION  CHARACTER VARYING(200),
     RELEASE_DATE DATE                  not null,
     DURATION     INTEGER               not null,
-    RATING       CHARACTER VARYING(10) not null,
+    RATING       INTEGER               not null,
     constraint FILMS_PK
-        primary key (FILM_ID)
+        primary key (FILM_ID),
+    constraint FILMS_MPA_MPA_ID_FK
+        foreign key (RATING) references MPA
 );
 
 create table IF NOT EXISTS USERS
 (
     USER_ID      INTEGER auto_increment,
-    USER_NAME    CHARACTER VARYING(30) not null,
+    USER_NAME    CHARACTER VARYING(30),
     EMAIL        CHARACTER VARYING(20),
-    BIRTHDAY     DATE                  not null,
     LOGIN       CHARACTER VARYING(10) not null,
+    BIRTHDAY     DATE                  not null,
     constraint USERS_PK
         primary key (USER_ID)
 );
@@ -24,20 +26,16 @@ create table IF NOT EXISTS USERS
 create table IF NOT EXISTS GENRES
 (
     GENRE_ID      INTEGER auto_increment,
-    GENRE_NAME    VARCHAR(10) not null,
+    GENRE_NAME    VARCHAR(20) not null,
     constraint GENRE_PK
         primary key (GENRE_ID)
 );
 
 
-
 create table IF NOT EXISTS FILMS_GENRE
 (
-    FILM_GENRE_ID INTEGER auto_increment,
-    GENRE_ID      INTEGER not null,
+    GENRE_ID      INTEGER,
     FILM_ID       INTEGER not null,
-    constraint FILMS_GENRE_PK
-        primary key (FILM_GENRE_ID),
     constraint FILMS_GENRE_FILMS_FILM_ID_FK
         foreign key (FILM_ID) references FILMS
             on update cascade on delete cascade,
@@ -47,11 +45,9 @@ create table IF NOT EXISTS FILMS_GENRE
 
 create table IF NOT EXISTS FILM_LIKES
 (
-    FILM_LIKE_ID INTEGER auto_increment,
     FILM_ID      INTEGER not null,
     USER_ID      INTEGER not null,
-    constraint FILM_LIKES_PK
-        primary key (FILM_LIKE_ID),
+
     constraint FILM_LIKES_FILMS_FILM_ID_FK
         foreign key (FILM_ID) references FILMS
             on update cascade on delete cascade,
@@ -62,17 +58,22 @@ create table IF NOT EXISTS FILM_LIKES
 
 create table IF NOT EXISTS USER_FRIENDS
 (
-    USER_FRIEND_ID INTEGER auto_increment,
     USER_ID        INTEGER not null,
     FRIEND_ID      INTEGER not null,
     STATUS         BOOLEAN,
-    constraint USER_FRIENDS_PK
-        primary key (USER_FRIEND_ID),
+
     constraint USER_FRIENDS_USERS_USER_ID_FK
         foreign key (USER_ID) references USERS
             on update cascade on delete cascade,
     constraint USER_FRIENDS_USERS_USER_ID_FK_2
         foreign key (FRIEND_ID) references USERS
             on update cascade on delete cascade
+);
+create table IF NOT EXISTS MPA
+(
+    MPA_ID   INTEGER               not null,
+    MPA_NAME CHARACTER VARYING(10) not null,
+    constraint MPA_PK
+        primary key (MPA_ID)
 );
 

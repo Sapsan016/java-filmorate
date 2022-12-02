@@ -4,32 +4,39 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+
 import javax.validation.Valid;
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
+@Repository
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
-public class InMemoryUserStorage implements UserStorage {
-    @NonFinal
-    int generatedId = 0;
-    final HashMap<Integer, User> users = new HashMap<>();
+public class DBUserStorage implements UserStorage {
+    JdbcTemplate jdbcTemplate;
 
-    @Override
-    public int getGeneratedId() {
-        return ++generatedId;
+    @Autowired
+    public DBUserStorage(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
+
 
     @Override
     public User getUserById(int id) {                                                      //Получаем пользователя по id
@@ -46,17 +53,26 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User createUser(@Valid @RequestBody User user) {                                       //Создаем пользователя
+    public User createUser(@Valid @RequestBody User user) {                              //Записываем пользователя в БД
         if (validateUser(user)) {                                         //Если пользователь прошел валидацию добавляем
-            user.setId(getGeneratedId());                                 //Создаем Id и пустой список друзей
-            user.setFriendsIds(new HashSet<>());
-            users.put(user.getId(), user);
+            String sqlQuery = "insert into USERS ( USER_NAME, EMAIL, LOGIN, BIRTHDAY) " +
+                    "values (?, ?, ?, ?)";
+            KeyHolder keyHolder = new GeneratedKeyHolder();                   // Переменная для получениЯ и хранения id
+            jdbcTemplate.update(connection -> {
+                PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"USER_ID"});
+                stmt.setString(1, user.getName());
+                stmt.setString(2, user.getEmail());
+                stmt.setString(3, user.getLogin());
+                stmt.setDate(4, Date.valueOf(user.getBirthday()));
+                return stmt;
+            }, keyHolder);
+            user.setId(keyHolder.getKey().intValue());                        //Задаем пользователю сгенерированый БД id
             log.info("Пользователь с Id = " + user.getId() + " создан");
-            return user;
         } else {
             log.error("Валидация не прошла");
             throw new ValidationException("Валидация не прошла");
         }
+        return user;
     }
 
     @Override

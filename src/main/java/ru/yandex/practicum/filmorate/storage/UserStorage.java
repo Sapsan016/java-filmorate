@@ -10,8 +10,6 @@ import java.util.ArrayList;
 @Component
 public interface UserStorage {
 
-    int getGeneratedId();
-
     User getUserById(int id);
 
     ArrayList<User> getAllUsers();                                                  //Получаем список всех пользователей
