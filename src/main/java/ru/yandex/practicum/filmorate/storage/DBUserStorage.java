@@ -42,7 +42,7 @@ public class DBUserStorage implements UserStorage {
     @Override
     public User getUserById(int id) {                                                      //Получаем пользователя по id
 
-        String sqlQuery = "select USER_ID, LOGIN, USER_NAME, BIRTHDAY " +
+        String sqlQuery = "select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY " +
                 "from USERS where USER_ID = ?";
         User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
 
@@ -51,16 +51,16 @@ public class DBUserStorage implements UserStorage {
             throw new UserNotFoundException("Пользователь с Id" + id + " не найден");
         }
 
-        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("select FRIEND_ID " +
-                "from FRIENDS where USER_ID = ?");
-        Set<Integer> friendsIds = new HashSet<>();
-        if (friendsRows.next()) {
-            friendsIds.add(
-                    friendsRows.getInt("FRIEND_ID"));
-        }
-        if (!friendsIds.isEmpty()) {
-            user.setFriendsIds(friendsIds);
-        }
+//        SqlRowSet friendsRows = jdbcTemplate.queryForRowSet("select FRIEND_ID " +
+//                "from FRIENDS where USER_ID = ?");
+//        Set<Integer> friendsIds = new HashSet<>();
+//        if (friendsRows.next()) {
+//            friendsIds.add(
+//                    friendsRows.getInt("FRIEND_ID"));
+//        }
+//        if (!friendsIds.isEmpty()) {
+//            user.setFriendsIds(friendsIds);
+//        }
         return user;
     }
 
@@ -120,14 +120,14 @@ public class DBUserStorage implements UserStorage {
 
     @Override
     public void deleteUserById(int id) {                                                         //Удаляем пользователя
-//        if (!users.containsKey(id)) {
+//        if (getUserById(id) == null) {
 //            log.error("Пользователь не найден");
 //            throw new UserNotFoundException("Пользователь с Id=" + id + " не найден");  //проверяем наличие пользователя
 //        }
 
         String sqlQuery = "delete from USERS where USER_ID = ?";
         jdbcTemplate.update(sqlQuery, id);
-        log.info("Пользователь с Id=" + id + " удален");
+        log.info("Пользователь с Id= " + id + " удален");
     }
 
     @Override
