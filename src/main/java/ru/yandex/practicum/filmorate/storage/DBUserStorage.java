@@ -42,18 +42,15 @@ public class DBUserStorage implements UserStorage {
 
     @Override
     public User getUserById(int id) {                                                      //Получаем пользователя по id
-
-        String sqlQuery = "select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY " +
-                "from USERS where USER_ID = ?";
-        User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
-
-        if (user == null) {                                                     //проверяем наличие пользовтеля
-            log.error("Пользователь не найден");
-            throw new UserNotFoundException("Пользователь с Id" + id + " не найден");
+        if (isPresent(id)) {
+            String sqlQuery = "select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY " +
+                    "from USERS where USER_ID = ?";
+            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+            return user;
         }
-
-        return user;
+        throw new UserNotFoundException("Пользователь не найден");
     }
+
 
     @Override
     public List<User> getAllUsers() {                                          //Получаем список всех пользователей
@@ -86,40 +83,28 @@ public class DBUserStorage implements UserStorage {
     }
 
     public User updateUser(@Valid @RequestBody User user) {                                    //Обновляем пользователя
-        final String CHECK = "SELECT * FROM users WHERE USER_ID = ?";
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(CHECK, user.getId());
-        if (!filmRows.next()) {
-            log.warn("Пользователь с id {} не найден", user.getId());
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-        if (validateUser(user)) {                                         //Если пользователь прошел валидацию обновляем
-
+        if (validateUser(user) && isPresent(user.getId())) {   //Если пользователь прошел валидацию и есть в базе обновляем
             final String SQL = "UPDATE users SET EMAIL = ?, USER_NAME = ?, LOGIN = ?, BIRTHDAY = ? " +
-                "WHERE USER_ID = ?";
-        jdbcTemplate.update(SQL,
-                user.getEmail(), user.getName(), user.getLogin(), user.getBirthday(), user.getId());
-        log.info("Пользователь {} обновлен", user.getId());
-        user.setFriendsIds(new HashSet<>());
-        return user;
+                    "WHERE USER_ID = ?";
+            jdbcTemplate.update(SQL,
+                    user.getEmail(), user.getName(), user.getLogin(), user.getBirthday(), user.getId());
+            log.info("Пользователь {} обновлен", user.getId());
+            user.setFriendsIds(new HashSet<>());
+            return user;
         } else {
-           log.error("Валидация не прошла");
+            log.error("Валидация не прошла");
             throw new ValidationException("Валидация не прошла");
         }
     }
 
     @Override
     public void deleteUserById(int id) {                                                         //Удаляем пользователя
-        final String CHECK = "SELECT * FROM users WHERE USER_ID = ?";
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(CHECK, id);
-        if (!filmRows.next()) {
-            log.warn("Пользователь с id {} не найден", id);
-            throw new UserNotFoundException("Пользователь не найден");
+        if (isPresent(id)) {
+            String sqlQuery = "delete from USERS where USER_ID = ?";
+            jdbcTemplate.update(sqlQuery, id);
+            log.info("Пользователь с Id= " + id + " удален");
         }
-        String sqlQuery = "delete from USERS where USER_ID = ?";
-        jdbcTemplate.update(sqlQuery, id);
-        log.info("Пользователь с Id= " + id + " удален");
     }
-
 
     @Override
     public boolean validateUser(User user) {                                                   //Валидация пользователя
@@ -142,5 +127,15 @@ public class DBUserStorage implements UserStorage {
                 .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
                 .friendsIds(new HashSet<>())
                 .build();
+    }
+
+    private boolean isPresent(int id) {                                           //Проверяем наличие пользователя в базе
+        final String CHECK = "SELECT * FROM users WHERE USER_ID = ?";
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(CHECK, id);
+        if (!filmRows.next()) {
+            log.warn("Пользователь с id {} не найден", id);
+            throw new UserNotFoundException("Пользователь не найден");
+        }
+        return true;
     }
 }
