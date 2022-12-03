@@ -22,9 +22,9 @@ create table IF NOT EXISTS FILMS
 create table IF NOT EXISTS USERS
 (
     USER_ID      INTEGER auto_increment,
-    EMAIL        CHARACTER VARYING(20),
-    USER_NAME    CHARACTER VARYING(30),
-    LOGIN       CHARACTER VARYING(10) not null,
+    EMAIL        CHARACTER VARYING(50),
+    USER_NAME    CHARACTER VARYING(50),
+    LOGIN       CHARACTER VARYING(50) not null,
     BIRTHDAY     DATE                  not null,
     constraint USERS_PK
         primary key (USER_ID)
