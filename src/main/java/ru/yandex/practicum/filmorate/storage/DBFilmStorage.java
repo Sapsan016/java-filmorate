@@ -80,7 +80,8 @@ public class DBFilmStorage implements FilmStorage{
             log.error("Не прошла валидация");
             throw new ValidationException("Не прошла валидация");
         }
-        film.setLikes(new HashSet<>());
+       // film.setLikes(new HashSet<>());
+        //film.setGenres(new ArrayList<>());
         return film;
     }
     @Override
@@ -98,7 +99,8 @@ public class DBFilmStorage implements FilmStorage{
                         , film.getDescription()
                         , film.getReleaseDate()
                         , film.getDuration()
-                        , film.getRating());
+                        , film.getRating()
+                        , film.getId());
                 log.info("Фильм с Id= " + film.getId() + " обновлен");
                 return film;
             } else {
