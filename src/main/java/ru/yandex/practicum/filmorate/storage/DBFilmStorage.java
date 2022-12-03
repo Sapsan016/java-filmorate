@@ -73,8 +73,8 @@ public class DBFilmStorage implements FilmStorage {
                 return stmt;
             }, keyHolder);
             film.setId(keyHolder.getKey().intValue());                        //Задаем фильму сгенерированый БД id
-            final String genreQuery = "INSERT INTO FILMS_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
             if (film.getGenres() != null) {
+                final String genreQuery = "INSERT INTO FILMS_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
                 for (Genre g : film.getGenres()) {
                     jdbcTemplate.update(genreQuery, film.getId(), g.getId());
                 }
@@ -84,17 +84,16 @@ public class DBFilmStorage implements FilmStorage {
             log.error("Не прошла валидация");
             throw new ValidationException("Не прошла валидация");
         }
-        film.setMpa(getMpaFromBD(film.getId()));
+        film.setMpa(getMpaFromBD(film.getId()));                    //Задаем фильму МРА и список жанров сохраненные в БД
         film.setGenres(getGenresFromBD(film.getId()));
-        film.setLikes(new HashSet<>());
-        System.out.println(film);
-
+        film.setLikes(new HashSet<>());                                                  //Добавляем новый список лайков
         return film;
     }
 
     @Override
     public Film updateFilm(@RequestBody Film film) throws ValidationException {                        //Обновляем фильм
         if (validateFilm(film) && isPresent(film.getId())) {       //Если фильм прошел валидацию и есть в базе обновляем
+            Set<Integer> temp = film.getLikes();
             String sqlQuery = "update FILMS set " +
                     " FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, RATING = ?" +
                     "where FILM_ID = ?";
@@ -103,9 +102,18 @@ public class DBFilmStorage implements FilmStorage {
                     , film.getDescription()
                     , film.getReleaseDate()
                     , film.getDuration()
-                    , film.getMpa()
+                    , film.getMpa().getId()
                     , film.getId());
+            if (film.getGenres() != null) {
+                final String genreQuery = "update  FILMS_GENRE set GENRE_ID = ? WHERE FILM_ID = ?";
+                for (Genre g : film.getGenres()) {
+                    jdbcTemplate.update(genreQuery, g.getId(), film.getId());
+                }
+            }
             log.info("Фильм с Id= " + film.getId() + " обновлен");
+            film.setLikes(temp);
+            film.setMpa(getMpaFromBD(film.getId()));                    //Задаем фильму МРА и список жанров сохраненные в БД
+            film.setGenres(getGenresFromBD(film.getId()));
             return film;
         } else {
             log.error("Валидация не прошла");
@@ -114,10 +122,10 @@ public class DBFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void removeFilmById(int id) {
+    public void removeFilmById(int id) {                                                          //Удаляем фильм из БД
         if (!isPresent(id)) {
             log.error("Фильм не найден");
-            throw new FilmNotFoundException("Фильм с Id= " + id + " не найден");    //Проверяем создание фильма
+            throw new FilmNotFoundException("Фильм с Id= " + id + " не найден");
         }
         String sqlQuery = "delete from FILMS where FILM_ID = ?";
         jdbcTemplate.update(sqlQuery, id);
@@ -126,7 +134,7 @@ public class DBFilmStorage implements FilmStorage {
 
     @Override
     public boolean validateFilm(Film film) {
-        LocalDate firstFilm = LocalDate.of(1895, 12, 28);                       //День рождения кино
+        LocalDate firstFilm = LocalDate.of(1895, 12, 28);                     //День рождения кино
 
         if (film.getName() == null || film.getName().isBlank()) {                            //Валидация названия фильма
             log.error("Неверное имя");
@@ -147,7 +155,7 @@ public class DBFilmStorage implements FilmStorage {
         return true;
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException { // Метод для преобразования запроса
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {      // Преобразуем запрос в фильм
         return Film.builder()
                 .id(resultSet.getInt("FILM_ID"))
                 .name(resultSet.getString("FILM_NAME"))
@@ -158,19 +166,19 @@ public class DBFilmStorage implements FilmStorage {
                 .build();
     }
 
-    private MPA mapRowToMpa(ResultSet rs, int rowNum) throws SQLException {
+    private MPA mapRowToMpa(ResultSet rs, int rowNum) throws SQLException {                  // Преобразуем запрос в МРА
         final int id = rs.getInt("MPA_ID");
         final String name = rs.getString("MPA_NAME");
         return new MPA(id, name);
     }
 
-    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
+    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в жанр
         final int id = rs.getInt("GENRE_ID");
         final String name = rs.getString("GENRE_NAME");
         return new Genre(id, name);
     }
 
-    private boolean isPresent(int id) {                                           //Проверяем наличие фильма в базе
+    private boolean isPresent(int id) {                                               //Проверяем наличие фильма в базе
         final String check = "SELECT * FROM FILMS WHERE FILM_ID = ?";
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(check, id);
         if (!filmRows.next()) {
@@ -180,21 +188,19 @@ public class DBFilmStorage implements FilmStorage {
         return true;
     }
 
-    private List<Genre> getGenresFromBD(int id) {
+    private List<Genre> getGenresFromBD(int id) {                                        //Получаем список жанров из БД
         final String genreSQL = "SELECT GENRES.GENRE_ID, GENRE_NAME " +
                 "FROM GENRES " +
                 "JOIN FILMS_GENRE FG on GENRES.GENRE_ID = FG.GENRE_ID " +
                 "WHERE FILM_ID = ?";
-
         return jdbcTemplate.query(genreSQL, this::mapRowToGenre, id);
     }
 
-    private MPA getMpaFromBD(int id) {
+    private MPA getMpaFromBD(int id) {                                                             //Получаем МРА из БД
         final String MPASQL = "SELECT MPA_ID, MPA_NAME " +
                 "FROM MPA " +
                 "JOIN FILMS F ON MPA.MPA_ID = F.RATING " +
                 "WHERE film_id = ?";
         return jdbcTemplate.queryForObject(MPASQL, this::mapRowToMpa, id);
     }
-
 }
