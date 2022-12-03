@@ -14,4 +14,12 @@ public class MPA {
     int id;
 
     String name;
+
+    @Override
+    public String toString() {
+        return "MPA{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

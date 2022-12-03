@@ -18,7 +18,20 @@ public class Film {
     LocalDate releaseDate;
     int duration;
     Set<Integer> likes;               //Список id пользователей поставивших лайк фильму
-    MPA mpa;                           //Рейтинг фильма
-    List<Integer> genres;              //Жанры фильма
+    MPA mpa;                         //Рейтинг фильма
+    List<Genre> genres;              //Жанры фильма
 
+    @Override
+    public String toString() {
+        return "Film{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", duration=" + duration +
+                ", likes=" + likes +
+                ", mpa=" + mpa +
+                ", genres=" + genres +
+                '}';
     }
+}

@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 
@@ -28,7 +29,7 @@ import java.util.*;
 
 @Component
 @Slf4j
-@FieldDefaults(level= AccessLevel.PRIVATE, makeFinal=true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
 public class DBFilmStorage implements FilmStorage {
 
@@ -42,7 +43,7 @@ public class DBFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilmById(int id) {                                                           //Возвращаем фильм по Id
-        if(isPresent(id)) {
+        if (isPresent(id)) {
             String sqlQuery = "select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING " +
                     "from FILMS where FILM_ID = ?";
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
@@ -69,26 +70,25 @@ public class DBFilmStorage implements FilmStorage {
                 stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
                 stmt.setInt(4, film.getDuration());
                 stmt.setInt(5, film.getMpa().getId());
-
                 return stmt;
             }, keyHolder);
             film.setId(keyHolder.getKey().intValue());                        //Задаем фильму сгенерированый БД id
             final String genreQuery = "INSERT INTO FILMS_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
             if (film.getGenres() != null) {
-                for (Integer g : film.getGenres()) {
-                    jdbcTemplate.update(genreQuery, film.getId(), g);
+                for (Genre g : film.getGenres()) {
+                    jdbcTemplate.update(genreQuery, film.getId(), g.getId());
                 }
             }
-
-
             log.info("Фильм с Id = " + film.getId() + " создан");
-
         } else {
             log.error("Не прошла валидация");
             throw new ValidationException("Не прошла валидация");
         }
-        // film.setLikes(new HashSet<>());
-        //film.setGenres(new ArrayList<>());
+        film.setMpa(getMpaFromBD(film.getId()));
+        film.setGenres(getGenresFromBD(film.getId()));
+        film.setLikes(new HashSet<>());
+        System.out.println(film);
+
         return film;
     }
 
@@ -115,8 +115,8 @@ public class DBFilmStorage implements FilmStorage {
 
     @Override
     public void removeFilmById(int id) {
-       if (!isPresent(id)) {
-           log.error("Фильм не найден");
+        if (!isPresent(id)) {
+            log.error("Фильм не найден");
             throw new FilmNotFoundException("Фильм с Id= " + id + " не найден");    //Проверяем создание фильма
         }
         String sqlQuery = "delete from FILMS where FILM_ID = ?";
@@ -160,16 +160,41 @@ public class DBFilmStorage implements FilmStorage {
 
     private MPA mapRowToMpa(ResultSet rs, int rowNum) throws SQLException {
         final int id = rs.getInt("MPA_ID");
-        final String name = rs.getString("name");
+        final String name = rs.getString("MPA_NAME");
         return new MPA(id, name);
     }
+
+    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
+        final int id = rs.getInt("GENRE_ID");
+        final String name = rs.getString("GENRE_NAME");
+        return new Genre(id, name);
+    }
+
     private boolean isPresent(int id) {                                           //Проверяем наличие фильма в базе
-        final String CHECK = "SELECT * FROM FILMS WHERE FILM_ID = ?";
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(CHECK, id);
+        final String check = "SELECT * FROM FILMS WHERE FILM_ID = ?";
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(check, id);
         if (!filmRows.next()) {
             log.warn("Фильм с id {} не найден", id);
             throw new FilmNotFoundException("Фильм не найден");
         }
         return true;
     }
+
+    private List<Genre> getGenresFromBD(int id) {
+        final String genreSQL = "SELECT GENRES.GENRE_ID, GENRE_NAME " +
+                "FROM GENRES " +
+                "JOIN FILMS_GENRE FG on GENRES.GENRE_ID = FG.GENRE_ID " +
+                "WHERE FILM_ID = ?";
+
+        return jdbcTemplate.query(genreSQL, this::mapRowToGenre, id);
+    }
+
+    private MPA getMpaFromBD(int id) {
+        final String MPASQL = "SELECT MPA_ID, MPA_NAME " +
+                "FROM MPA " +
+                "JOIN FILMS F ON MPA.MPA_ID = F.RATING " +
+                "WHERE film_id = ?";
+        return jdbcTemplate.queryForObject(MPASQL, this::mapRowToMpa, id);
+    }
+
 }
