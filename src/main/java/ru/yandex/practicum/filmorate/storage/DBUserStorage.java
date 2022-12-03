@@ -2,11 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -27,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 @Repository
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,8 +43,7 @@ public class DBUserStorage implements UserStorage {
         if (isPresent(id)) {
             String sqlQuery = "select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY " +
                     "from USERS where USER_ID = ?";
-            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
-            return user;
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
         }
         throw new UserNotFoundException("Пользователь не найден");
     }
@@ -73,7 +70,7 @@ public class DBUserStorage implements UserStorage {
                 return stmt;
             }, keyHolder);
             user.setId(keyHolder.getKey().intValue());                        //Задаем пользователю сгенерированый БД id
-            log.info("Пользователь с Id = " + user.getId() + " создан");
+            log.info("Пользователь с Id = {} создан", user.getId());
         } else {
             log.error("Валидация не прошла");
             throw new ValidationException("Валидация не прошла");
@@ -84,12 +81,13 @@ public class DBUserStorage implements UserStorage {
 
     public User updateUser(@Valid @RequestBody User user) {                                    //Обновляем пользователя
         if (validateUser(user) && isPresent(user.getId())) {   //Если пользователь прошел валидацию и есть в базе обновляем
+            Set<Integer> temp = new HashSet<>();
             final String SQL = "UPDATE users SET EMAIL = ?, USER_NAME = ?, LOGIN = ?, BIRTHDAY = ? " +
                     "WHERE USER_ID = ?";
             jdbcTemplate.update(SQL,
                     user.getEmail(), user.getName(), user.getLogin(), user.getBirthday(), user.getId());
-            log.info("Пользователь {} обновлен", user.getId());
-            user.setFriendsIds(new HashSet<>());
+            log.info("Пользователь с Id = {} обновлен", user.getId());
+            user.setFriendsIds(temp);
             return user;
         } else {
             log.error("Валидация не прошла");
@@ -105,7 +103,6 @@ public class DBUserStorage implements UserStorage {
             log.info("Пользователь с Id= " + id + " удален");
         }
     }
-
     @Override
     public boolean validateUser(User user) {                                                   //Валидация пользователя
         if (user.getName() == null || user.getName().isBlank()) {  //Если имя не заполнено, то использем логин для имени
