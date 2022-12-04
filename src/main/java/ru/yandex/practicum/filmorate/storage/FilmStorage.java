@@ -16,6 +16,7 @@ public interface FilmStorage {
     Film addFilm(@RequestBody Film film);                                                     //Добавляем фильм
 
     Film updateFilm(@RequestBody Film film) throws ValidationException;                   //Обновляем фильм
+    public Film addLike(int filmId, int userId);
 
     boolean validateFilm(Film film);
 

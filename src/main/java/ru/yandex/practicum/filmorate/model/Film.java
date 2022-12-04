@@ -17,7 +17,7 @@ public class Film {
     String description;
     LocalDate releaseDate;
     int duration;
-    Set<Integer> likes;               //Список id пользователей поставивших лайк фильму
+    List<Integer> likes;               //Список id пользователей поставивших лайк фильму
     MPA mpa;                         //Рейтинг фильма
     List<Genre> genres;              //Жанры фильма
 

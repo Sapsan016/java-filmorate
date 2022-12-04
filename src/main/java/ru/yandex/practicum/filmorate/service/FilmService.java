@@ -50,7 +50,8 @@ public class FilmService {
             log.error("Фильм или пользователь не найдены");
             throw new FilmNotFoundException("Фильм или пользователь не найдены");
         }
-        film.getLikes().add(userId);
+       // film.getLikes().add(userId);
+        filmStorage.addLike(filmId,userId);
     }
 
     public void  removeLike(int filmId, int userId) {                                                   //Удаление лайка

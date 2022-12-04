@@ -44,9 +44,13 @@ public class DBFilmStorage implements FilmStorage {
     @Override
     public Film getFilmById(int id) {                                                           //Возвращаем фильм по Id
         if (isPresent(id)) {
-            String sqlQuery = "select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING " +
-                    "from FILMS where FILM_ID = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
+            String sqlQuery = "select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION " +
+                     "from FILMS where FILM_ID = ?";
+            Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
+            film.setMpa(getMpaFromBD(film.getId()));         //Задаем фильму МРА,список жанров и лайков сохраненные в БД
+            film.setGenres(getGenresFromBD(film.getId()));
+            film.setLikes(getLikesFromBD(film.getId()));
+            return film;
         }
         throw new FilmNotFoundException("Фильм не найден");
     }
@@ -54,7 +58,14 @@ public class DBFilmStorage implements FilmStorage {
     @Override
     public List<Film> getAllFilms() {                                               //Получаем список всех фильмов
         String sqlQuery = "select * from FILMS";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+        List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+        for(Film film : films) {
+            film.setMpa(getMpaFromBD(film.getId()));         //Задаем фильму МРА,список жанров и лайков сохраненные в БД
+            film.setGenres(getGenresFromBD(film.getId()));
+            film.setLikes(getLikesFromBD(film.getId()));
+
+        }
+        return films;
     }
 
     @Override
@@ -86,14 +97,15 @@ public class DBFilmStorage implements FilmStorage {
         }
         film.setMpa(getMpaFromBD(film.getId()));                    //Задаем фильму МРА и список жанров сохраненные в БД
         film.setGenres(getGenresFromBD(film.getId()));
-        film.setLikes(new HashSet<>());                                                  //Добавляем новый список лайков
+        film.setLikes(new ArrayList<>() {
+        });                                                  //Добавляем новый список лайков
         return film;
     }
 
     @Override
     public Film updateFilm(@RequestBody Film film) throws ValidationException {                        //Обновляем фильм
         if (validateFilm(film) && isPresent(film.getId())) {       //Если фильм прошел валидацию и есть в базе обновляем
-            Set<Integer> temp = film.getLikes();
+            List<Integer> temp = film.getLikes();
             String sqlQuery = "update FILMS set " +
                     " FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, RATING = ?" +
                     "where FILM_ID = ?";
@@ -119,6 +131,13 @@ public class DBFilmStorage implements FilmStorage {
             log.error("Валидация не прошла");
             throw new ValidationException("Валидация не прошла");
         }
+    }
+
+    @Override
+    public Film addLike(int filmId, int userId) {
+        final String SQL = "INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
+        jdbcTemplate.update(SQL, filmId, userId);
+        return getFilmById(filmId);
     }
 
     @Override
@@ -162,7 +181,6 @@ public class DBFilmStorage implements FilmStorage {
                 .description(resultSet.getString("DESCRIPTION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
                 .duration(resultSet.getInt("DURATION"))
-                .mpa(mapRowToMpa(resultSet, rowNum))
                 .build();
     }
 
@@ -203,4 +221,14 @@ public class DBFilmStorage implements FilmStorage {
                 "WHERE film_id = ?";
         return jdbcTemplate.queryForObject(MPASQL, this::mapRowToMpa, id);
     }
+    private List<Integer> getLikesFromBD(int id) {                                        //Получаем список жанров из БД
+        final String genreSQL = "SELECT USER_ID FROM FILM_LIKES " +
+                                 "WHERE FILM_ID = ?";
+
+        return jdbcTemplate.query(genreSQL, this::mapRowToLikes, id);
+    }
+    private int mapRowToLikes(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в лайк
+        return rs.getInt("USER_ID");
+    }
+
 }
