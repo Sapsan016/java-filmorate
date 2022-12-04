@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
 import javax.validation.Valid;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -22,7 +21,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -46,6 +44,7 @@ public class DBUserStorage implements UserStorage {
             user.setFriendsIds(friendList);
             return user;
         }
+        log.info("Пользователь с Id = {} не найден", id);
         throw new UserNotFoundException("Пользователь не найден");
     }
     @Override
@@ -85,8 +84,8 @@ public class DBUserStorage implements UserStorage {
     public User updateUser(@Valid @RequestBody User user) {                                    //Обновляем пользователя
         if (validateUser(user) && isPresent(user.getId())) {   //Если пользователь прошел валидацию и есть в базе обновляем
             List<Integer> temp = user.getFriendsIds();
-            final String SQL = "UPDATE users SET EMAIL = ?, USER_NAME = ?, LOGIN = ?, BIRTHDAY = ? " +
-                    "WHERE USER_ID = ?";
+            final String SQL = "update USERS set EMAIL = ?, USER_NAME = ?, LOGIN = ?, BIRTHDAY = ? " +
+                    "where USER_ID = ?";
             jdbcTemplate.update(SQL,
                     user.getEmail(), user.getName(), user.getLogin(), user.getBirthday(), user.getId());
             log.info("Пользователь с Id = {} обновлен", user.getId());
@@ -101,29 +100,29 @@ public class DBUserStorage implements UserStorage {
     @Override
     public void deleteUserById(int id) {                                                         //Удаляем пользователя
         if (isPresent(id)) {
-            String sqlQuery = "delete from USERS where USER_ID = ?";
+            final String sqlQuery = "delete from USERS where USER_ID = ?";
             jdbcTemplate.update(sqlQuery, id);
             log.info("Пользователь с Id= " + id + " удален");
         }
     }
-
     @Override
-    public void addFriend(int userId, int friendId) {
-        final String SQL = "insert into FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, ?)";
+    public void addFriend(int userId, int friendId) {                                                 //Добавляем друга
+        if(!isPresent(userId) || !isPresent(friendId)) {
+            log.info("Пользователь не найден");
+            throw new UserNotFoundException("Пользователь не найден");
+        }
+        final String SQL = "insert into FRIENDS (USER_ID, FRIEND_ID, STATUS) values (?, ?, ?)";
         jdbcTemplate.update(SQL, userId, friendId, false);
-
     }
-
-
     @Override
-    public List<User> removeFriend(int userId, int friendId) {
-        return null;
+    public void removeFriend(int userId, int friendId) {                                                 //Удаляем друга
+        if(!isPresent(userId) || !isPresent(friendId)) {
+            log.info("Пользователь не найден");
+            throw new UserNotFoundException("Пользователь не найден");
+        }
+        final String sqlQuery = "delete from FRIENDS where USER_ID = ? and FRIEND_ID = ?";
+        jdbcTemplate.update(sqlQuery, userId, friendId);
     }
-
-
-
-
-
     @Override
     public boolean validateUser(User user) {                                                   //Валидация пользователя
         if (user.getName() == null || user.getName().isBlank()) {  //Если имя не заполнено, то использем логин для имени
@@ -134,6 +133,12 @@ public class DBUserStorage implements UserStorage {
             throw new ValidationException("Неверная дата рождения");
         }
         return true;
+    }
+    @Override
+    public List<Integer> getFriendIdsFromBD(int id) {                             // Получаем список Id друзей из базы
+        final String friendSQL = "select FRIEND_ID from FRIENDS " +
+                "where USER_ID = ?";
+        return jdbcTemplate.query(friendSQL, this::mapRowToFriendsIds, id);
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException { // Метод для преобразования запроса
@@ -147,27 +152,18 @@ public class DBUserStorage implements UserStorage {
     }
 
     private boolean isPresent(int id) {                                           //Проверяем наличие пользователя в базе
-        final String check = "SELECT * FROM users WHERE USER_ID = ?";
+        final String check = "select * from users where USER_ID = ?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(check, id);
         if (!userRows.next()) {
             log.warn("Пользователь с id {} не найден", id);
             throw new UserNotFoundException("Пользователь не найден");
-
         }
         return true;
     }
-    private List<Integer> getFriendIdsFromBD(int id) {
-        final String friendSQL = "SELECT FRIEND_ID FROM FRIENDS " +
-                                 "WHERE USER_ID = ?";
-        return jdbcTemplate.query(friendSQL, this::mapRowToFriendsIds, id);
-    }
-    private Integer mapRowToFriendsIds(ResultSet rs, int rowNum) throws SQLException {
+
+    private Integer mapRowToFriendsIds(ResultSet rs, int rowNum) throws SQLException {   //Преобразуем данные из БД в Id
         return rs.getInt("FRIEND_ID");
-
-
     }
-
-
 }
 
 

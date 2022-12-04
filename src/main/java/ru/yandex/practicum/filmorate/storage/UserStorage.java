@@ -19,7 +19,8 @@ public interface UserStorage {
     User updateUser(@Valid @RequestBody User user) throws ValidationException;                  //Обновляем пользователя
     boolean validateUser(User user);
     void deleteUserById(int id);
+    public List<Integer> getFriendIdsFromBD(int id);                            // Получаем список Id друзей из базы
     void addFriend(int userId, int friendId);                                                    //Добавляем лайк
-    List<User> removeFriend(int userId, int friendId);                                                 //Удаляем лайк
+    void removeFriend(int userId, int friendId);                                                 //Удаляем лайк
 
 }
