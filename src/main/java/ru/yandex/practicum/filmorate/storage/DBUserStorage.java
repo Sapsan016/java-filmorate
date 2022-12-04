@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Set;
 
 
-@Repository
+
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
+@Repository
 public class DBUserStorage implements UserStorage {
     JdbcTemplate jdbcTemplate;
 

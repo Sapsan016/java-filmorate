@@ -50,8 +50,7 @@ public class FilmService {
             log.error("Фильм или пользователь не найдены");
             throw new FilmNotFoundException("Фильм или пользователь не найдены");
         }
-       // film.getLikes().add(userId);
-        filmStorage.addLike(filmId,userId);
+       filmStorage.addLike(filmId,userId);
     }
 
     public void  removeLike(int filmId, int userId) {                                                   //Удаление лайка
@@ -60,7 +59,7 @@ public class FilmService {
             log.error("Фильм или пользователь не найдены");
             throw new FilmNotFoundException("Фильм или пользователь не найдены");
         }
-        film.getLikes().remove(userId);
+        filmStorage.removeLike(filmId,userId);
     }
 
     public List<Film> getMostPopularFilms(int count) {                               //вывод наиболее популярных фильмов

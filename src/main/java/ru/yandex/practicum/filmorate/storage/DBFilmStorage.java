@@ -2,24 +2,19 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
-
-
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,10 +22,10 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
-@Component
+
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
+@Repository
 public class DBFilmStorage implements FilmStorage {
 
     JdbcTemplate jdbcTemplate;
@@ -63,7 +58,6 @@ public class DBFilmStorage implements FilmStorage {
             film.setMpa(getMpaFromBD(film.getId()));         //Задаем фильму МРА,список жанров и лайков сохраненные в БД
             film.setGenres(getGenresFromBD(film.getId()));
             film.setLikes(getLikesFromBD(film.getId()));
-
         }
         return films;
     }
@@ -134,8 +128,15 @@ public class DBFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film addLike(int filmId, int userId) {
+    public Film addLike(int filmId, int userId) {                                                      //Добавляем лайк
         final String SQL = "INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
+        jdbcTemplate.update(SQL, filmId, userId);
+        return getFilmById(filmId);
+    }
+
+    @Override
+    public Film removeLike(int filmId, int userId) {                                                     //Удаляем лайк
+        final String SQL = "delete from FILM_LIKES where FILM_ID = ? and USER_ID = ?";
         jdbcTemplate.update(SQL, filmId, userId);
         return getFilmById(filmId);
     }
@@ -184,12 +185,6 @@ public class DBFilmStorage implements FilmStorage {
                 .build();
     }
 
-    private MPA mapRowToMpa(ResultSet rs, int rowNum) throws SQLException {                  // Преобразуем запрос в МРА
-        final int id = rs.getInt("MPA_ID");
-        final String name = rs.getString("MPA_NAME");
-        return new MPA(id, name);
-    }
-
     private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в жанр
         final int id = rs.getInt("GENRE_ID");
         final String name = rs.getString("GENRE_NAME");
@@ -219,7 +214,7 @@ public class DBFilmStorage implements FilmStorage {
                 "FROM MPA " +
                 "JOIN FILMS F ON MPA.MPA_ID = F.RATING " +
                 "WHERE film_id = ?";
-        return jdbcTemplate.queryForObject(MPASQL, this::mapRowToMpa, id);
+        return jdbcTemplate.queryForObject(MPASQL, MpaStorage::mapRowToMpa, id);
     }
     private List<Integer> getLikesFromBD(int id) {                                        //Получаем список жанров из БД
         final String genreSQL = "SELECT USER_ID FROM FILM_LIKES " +
@@ -230,5 +225,4 @@ public class DBFilmStorage implements FilmStorage {
     private int mapRowToLikes(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в лайк
         return rs.getInt("USER_ID");
     }
-
 }
