@@ -45,17 +45,17 @@ public class DBUserStorage implements UserStorage {
                     ? new ArrayList<>(): getFriendIdsFromBD(id);
             user.setFriendsIds(friendList);
             return user;
-
         }
         throw new UserNotFoundException("Пользователь не найден");
     }
-
-
-
     @Override
     public List<User> getAllUsers() {                                          //Получаем список всех пользователей
         String sqlQuery = "select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY from USERS";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
+        List<User> users = jdbcTemplate.query(sqlQuery, this::mapRowToUser);
+        for(User user : users) {
+            user.setFriendsIds(getFriendIdsFromBD(user.getId()));
+        }
+        return users;
     }
 
     @Override
