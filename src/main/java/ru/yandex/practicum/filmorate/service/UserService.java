@@ -56,9 +56,8 @@ public class UserService {
             log.error("Пользователь не найден");
             throw new UserNotFoundException("Пользователь не найден");
         }
-        user.getFriendsIds().add(friendId);                                  //Добавляем Id пользователей в списки друзей
-        friend.getFriendsIds().add(userId);
-        log.info("Пользователи с Id = " + userId + " и Id = " + friendId + " теперь друзья");
+        userStorage.addFriend(userId, friendId);
+        log.info("Пользователь с Id = {} добавил пользователя с Id = {}  в друзья", userId, friendId);
     }
 
     public void removeFriend(int userId, int friendId) {                                            //удаление из друзей

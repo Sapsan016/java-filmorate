@@ -42,9 +42,9 @@ public class DBFilmStorage implements FilmStorage {
             String sqlQuery = "select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION " +
                      "from FILMS where FILM_ID = ?";
             Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
-            film.setMpa(getMpaFromBD(film.getId()));         //Задаем фильму МРА,список жанров и лайков сохраненные в БД
-            film.setGenres(getGenresFromBD(film.getId()));
-            film.setLikes(getLikesFromBD(film.getId()));
+            film.setMpa(getMpaFromBD(id));         //Задаем фильму МРА,список жанров и лайков сохраненные в БД
+            film.setGenres(getGenresFromBD(id));
+            film.setLikes(getLikesFromBD(id));
             return film;
         }
         throw new FilmNotFoundException("Фильм не найден");
@@ -184,7 +184,6 @@ public class DBFilmStorage implements FilmStorage {
                 .duration(resultSet.getInt("DURATION"))
                 .build();
     }
-
     private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в жанр
         final int id = rs.getInt("GENRE_ID");
         final String name = rs.getString("GENRE_NAME");

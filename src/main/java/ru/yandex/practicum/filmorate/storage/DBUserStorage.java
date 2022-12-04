@@ -20,10 +20,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 
 
 @Slf4j
@@ -41,12 +39,17 @@ public class DBUserStorage implements UserStorage {
     @Override
     public User getUserById(int id) {                                                      //Получаем пользователя по id
         if (isPresent(id)) {
-            String sqlQuery = "select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY " +
-                    "from USERS where USER_ID = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+            String sqlQuery = "select * from USERS where USER_ID = ?";
+            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+            List<Integer> friendList = getFriendIdsFromBD(id).isEmpty()  //Если список id друзей не пустой добавляем пользователю
+                    ? new ArrayList<>(): getFriendIdsFromBD(id);
+            user.setFriendsIds(friendList);
+            return user;
+
         }
         throw new UserNotFoundException("Пользователь не найден");
     }
+
 
 
     @Override
@@ -75,13 +78,13 @@ public class DBUserStorage implements UserStorage {
             log.error("Валидация не прошла");
             throw new ValidationException("Валидация не прошла");
         }
-        user.setFriendsIds(new HashSet<>());
+        user.setFriendsIds(new ArrayList<>());
         return user;
     }
 
     public User updateUser(@Valid @RequestBody User user) {                                    //Обновляем пользователя
         if (validateUser(user) && isPresent(user.getId())) {   //Если пользователь прошел валидацию и есть в базе обновляем
-            Set<Integer> temp = new HashSet<>();
+            List<Integer> temp = user.getFriendsIds();
             final String SQL = "UPDATE users SET EMAIL = ?, USER_NAME = ?, LOGIN = ?, BIRTHDAY = ? " +
                     "WHERE USER_ID = ?";
             jdbcTemplate.update(SQL,
@@ -103,6 +106,24 @@ public class DBUserStorage implements UserStorage {
             log.info("Пользователь с Id= " + id + " удален");
         }
     }
+
+    @Override
+    public void addFriend(int userId, int friendId) {
+        final String SQL = "insert into FRIENDS (USER_ID, FRIEND_ID, STATUS) VALUES (?, ?, ?)";
+        jdbcTemplate.update(SQL, userId, friendId, false);
+
+    }
+
+
+    @Override
+    public List<User> removeFriend(int userId, int friendId) {
+        return null;
+    }
+
+
+
+
+
     @Override
     public boolean validateUser(User user) {                                                   //Валидация пользователя
         if (user.getName() == null || user.getName().isBlank()) {  //Если имя не заполнено, то использем логин для имени
@@ -122,17 +143,31 @@ public class DBUserStorage implements UserStorage {
                 .name(resultSet.getString("USER_NAME"))
                 .login(resultSet.getString("LOGIN"))
                 .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
-                .friendsIds(new HashSet<>())
                 .build();
     }
 
     private boolean isPresent(int id) {                                           //Проверяем наличие пользователя в базе
-        final String CHECK = "SELECT * FROM users WHERE USER_ID = ?";
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(CHECK, id);
-        if (!filmRows.next()) {
+        final String check = "SELECT * FROM users WHERE USER_ID = ?";
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet(check, id);
+        if (!userRows.next()) {
             log.warn("Пользователь с id {} не найден", id);
             throw new UserNotFoundException("Пользователь не найден");
+
         }
         return true;
     }
+    private List<Integer> getFriendIdsFromBD(int id) {
+        final String friendSQL = "SELECT FRIEND_ID FROM FRIENDS " +
+                                 "WHERE USER_ID = ?";
+        return jdbcTemplate.query(friendSQL, this::mapRowToFriendsIds, id);
+    }
+    private Integer mapRowToFriendsIds(ResultSet rs, int rowNum) throws SQLException {
+        return rs.getInt("FRIEND_ID");
+
+
+    }
+
+
 }
+
+

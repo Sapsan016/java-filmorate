@@ -18,7 +18,7 @@ merge into MPA(MPA_ID,MPA_NAME)
 merge into MPA(MPA_ID,MPA_NAME)
     values (2, 'PG');
 merge into MPA(MPA_ID,MPA_NAME)
-    values (3, 'PG_13');
+    values (3, 'PG-13');
 merge into MPA(MPA_ID,MPA_NAME)
     values (4, 'R');
 merge into MPA(MPA_ID,MPA_NAME)

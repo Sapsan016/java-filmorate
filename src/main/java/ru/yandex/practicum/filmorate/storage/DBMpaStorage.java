@@ -13,12 +13,10 @@ import java.util.List;
 @Repository
 public class DBMpaStorage implements MpaStorage {
     JdbcTemplate jdbcTemplate;
-
     @Autowired
     public DBMpaStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
     @Override
     public List<MPA> getAllMpa() {                                                             //Получаем все МРА из БД
         String sqlQuery = "select * from MPA";

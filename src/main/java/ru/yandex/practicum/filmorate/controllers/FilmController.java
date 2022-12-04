@@ -24,37 +24,37 @@ public class FilmController {
     }
 
     @GetMapping()
-    public List<Film> getAllFilms() {                                     //Запрос на получение списка всех фильмов
+    public List<Film> getAllFilms() {                                     //Эндпойнт для получение списка всех фильмов
         return filmService.getAllFilms();
     }
 
-    @GetMapping("/{id}")                                                           //запрос на получение фильма по Id
+    @GetMapping("/{id}")                                                           //Эндпойнт для получение фильма по Id
     public Film getFilmById(@PathVariable("id") int id){
         return filmService.getFilmById(id);
     }
     @PostMapping()
-    public void addFilm(@RequestBody Film film) {                                         //Запрос на добавление фильма
+    public void addFilm(@RequestBody Film film) {                                         //Эндпойнт для добавление фильма
         filmService.addFilm(film);
     }
 
     @PutMapping()
-    public void updateFilm(@RequestBody Film film) throws ValidationException {            //Запрос на обновление фильма
+    public void updateFilm(@RequestBody Film film) throws ValidationException {            //Эндпойнт для обновление фильма
         filmService.updateFilm(film);
     }
-    @DeleteMapping("/{id}")                                                               //запрос на удаление фильма
+    @DeleteMapping("/{id}")                                                               //Эндпойнт для удаление фильма
     public void removeFilmById(@PathVariable("id") int id){
         filmService.removeFilmById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}")                                                  //Запрос на добавление лайка
+    @PutMapping("/{id}/like/{userId}")                                                  //Эндпойнт для добавление лайка
     public void addLike(@PathVariable("id") int filmId, @PathVariable("userId") int userId){
         filmService.addLike(filmId,userId);
     }
-    @DeleteMapping("/{id}/like/{userId}")                                                 //Запрос на удаление лайка
+    @DeleteMapping("/{id}/like/{userId}")                                                 //Эндпойнт для удаление лайка
     public void removeLike(@PathVariable("id") int filmId, @PathVariable("userId") int userId) {
         filmService.removeLike(filmId,userId);
     }
-    @GetMapping("/popular")                                            //Запрос на получение самых популярных фильмов
+    @GetMapping("/popular")                                            //Эндпойнт для самых популярных фильмов
     public List<Film> getMostPopularFilms(@RequestParam(defaultValue = "10", required = false) Integer count){
         return filmService.getMostPopularFilms(count);
     }

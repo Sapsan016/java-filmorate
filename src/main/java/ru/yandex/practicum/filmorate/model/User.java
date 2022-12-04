@@ -7,6 +7,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -27,6 +28,6 @@ public class User {
     @NotNull                                                                      //Проверка на заполнение даты рождения
     LocalDate birthday;
 
-    Set<Integer> friendsIds;                                                               //Поле для хранения Id друзей
+    List<Integer> friendsIds;                                                               //Поле для хранения Id друзей
 
 }

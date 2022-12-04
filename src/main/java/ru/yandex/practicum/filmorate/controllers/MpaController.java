@@ -18,18 +18,15 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MpaController {
     final MpaService mpaService;
-
     @Autowired
     public MpaController(MpaService mpaService) {
         this.mpaService = mpaService;
     }
-
     @GetMapping()
     public List<MPA> getAllMpa() {                                       //Запрос на получение списка всех рейтингов МРА
         return mpaService.getAll();
-    }
-
-    @GetMapping("/{id}")                                                     //запрос на получение рейтинга MPA по Id
+    }               //Эндпойнт для получения списка всех МРА
+    @GetMapping("/{id}")                                                     //Эндпойнт на получение рейтинга MPA по Id
     public MPA getMpaById(@PathVariable("id") int id){
         return mpaService.getMpaById(id);
     }
