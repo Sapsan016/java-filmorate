@@ -38,8 +38,8 @@ public class FilmController {
     }
 
     @PutMapping()
-    public void updateFilm(@RequestBody Film film) throws ValidationException {            //Эндпойнт для обновление фильма
-        filmService.updateFilm(film);
+    public Film updateFilm(@RequestBody Film film) throws ValidationException {            //Эндпойнт для обновление фильма
+        return filmService.updateFilm(film);
     }
     @DeleteMapping("/{id}")                                                               //Эндпойнт для удаление фильма
     public void removeFilmById(@PathVariable("id") int id){
