@@ -1,5 +1,4 @@
 package ru.yandex.practicum.filmorate.storage;
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -21,19 +20,15 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Repository
 public class DBUserStorage implements UserStorage {
     JdbcTemplate jdbcTemplate;
-
     @Autowired
     public DBUserStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
-
     @Override
     public User getUserById(int id) {                                                      //Получаем пользователя по id
         if (isPresent(id)) {
@@ -56,7 +51,6 @@ public class DBUserStorage implements UserStorage {
         }
         return users;
     }
-
     @Override
     public User createUser(@Valid @RequestBody User user) {                              //Записываем пользователя в БД
         if (validateUser(user)) {                                         //Если пользователь прошел валидацию добавляем
@@ -80,7 +74,6 @@ public class DBUserStorage implements UserStorage {
         user.setFriendsIds(new ArrayList<>());
         return user;
     }
-
     public User updateUser(@Valid @RequestBody User user) {                                    //Обновляем пользователя
         if (validateUser(user) && isPresent(user.getId())) {   //Если пользователь прошел валидацию и есть в базе обновляем
             List<Integer> temp = user.getFriendsIds();
@@ -96,7 +89,6 @@ public class DBUserStorage implements UserStorage {
             throw new ValidationException("Валидация не прошла");
         }
     }
-
     @Override
     public void deleteUserById(int id) {                                                         //Удаляем пользователя
         if (isPresent(id)) {
@@ -140,7 +132,6 @@ public class DBUserStorage implements UserStorage {
                 "where USER_ID = ?";
         return jdbcTemplate.query(friendSQL, this::mapRowToFriendsIds, id);
     }
-
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException { // Метод для преобразования запроса
         return User.builder()
                 .id(resultSet.getInt("USER_ID"))
@@ -150,7 +141,6 @@ public class DBUserStorage implements UserStorage {
                 .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
                 .build();
     }
-
     private boolean isPresent(int id) {                                           //Проверяем наличие пользователя в базе
         final String check = "select * from users where USER_ID = ?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(check, id);
@@ -160,10 +150,7 @@ public class DBUserStorage implements UserStorage {
         }
         return true;
     }
-
     private Integer mapRowToFriendsIds(ResultSet rs, int rowNum) throws SQLException {   //Преобразуем данные из БД в Id
         return rs.getInt("FRIEND_ID");
     }
 }
-
-

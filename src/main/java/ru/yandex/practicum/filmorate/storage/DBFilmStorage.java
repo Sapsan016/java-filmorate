@@ -70,7 +70,7 @@ public class DBFilmStorage implements FilmStorage {
             }, keyHolder);
             film.setId(keyHolder.getKey().intValue());                        //Задаем фильму сгенерированый БД id
             if (film.getGenres() != null) {
-                final String genreQuery = "INSERT INTO FILMS_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
+                final String genreQuery = "insert into FILMS_GENRE (FILM_ID, GENRE_ID) values (?, ?)";
                 for (Genre g : film.getGenres()) {
                     jdbcTemplate.update(genreQuery, film.getId(), g.getId());
                 }
@@ -90,7 +90,7 @@ public class DBFilmStorage implements FilmStorage {
         if (validateFilm(film) && isPresent(film.getId())) {       //Если фильм прошел валидацию и есть в базе обновляем
             List<Integer> temp = film.getLikes();
             String sqlQuery = "update FILMS set " +
-                    " FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, RATING = ?" +
+                    "FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, RATING = ?" +
                     "where FILM_ID = ?";
             jdbcTemplate.update(sqlQuery
                     , film.getName()
@@ -124,7 +124,7 @@ public class DBFilmStorage implements FilmStorage {
     }
     @Override
     public Film addLike(int filmId, int userId) {                                                      //Добавляем лайк
-        final String SQL = "INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
+        final String SQL = "insert into FILM_LIKES (FILM_ID, USER_ID) values (?, ?)";
         jdbcTemplate.update(SQL, filmId, userId);
         return getFilmById(filmId);
     }
@@ -185,22 +185,22 @@ public class DBFilmStorage implements FilmStorage {
         return true;
     }
     private List<Genre> getGenresFromBD(int id) {                                        //Получаем список жанров из БД
-        final String genreSQL = "SELECT GENRES.GENRE_ID, GENRE_NAME " +
-                "FROM GENRES " +
-                "JOIN FILMS_GENRE FG on GENRES.GENRE_ID = FG.GENRE_ID " +
-                "WHERE FILM_ID = ?";
+        final String genreSQL = "select GENRES.GENRE_ID, GENRE_NAME " +
+                "from GENRES " +
+                "join FILMS_GENRE FG on GENRES.GENRE_ID = FG.GENRE_ID " +
+                "where FILM_ID = ?";
         return jdbcTemplate.query(genreSQL, GenreStorage::mapRowToGenre, id);
     }
     private MPA getMpaFromBD(int id) {                                                             //Получаем МРА из БД
-        final String MPASQL = "SELECT MPA_ID, MPA_NAME " +
-                "FROM MPA " +
-                "JOIN FILMS F ON MPA.MPA_ID = F.RATING " +
-                "WHERE film_id = ?";
+        final String MPASQL = "select MPA_ID, MPA_NAME " +
+                "from MPA " +
+                "join FILMS F ON MPA.MPA_ID = F.RATING " +
+                "where film_id = ?";
         return jdbcTemplate.queryForObject(MPASQL, MpaStorage::mapRowToMpa, id);
     }
     private List<Integer> getLikesFromBD(int id) {                                        //Получаем список жанров из БД
-        final String genreSQL = "SELECT USER_ID FROM FILM_LIKES " +
-                "WHERE FILM_ID = ?";
+        final String genreSQL = "select USER_ID from FILM_LIKES " +
+                "where FILM_ID = ?";
 
         return jdbcTemplate.query(genreSQL, this::mapRowToLikes, id);
     }

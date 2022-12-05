@@ -23,7 +23,7 @@ public class DBMpaStorage implements MpaStorage {
         return jdbcTemplate.query(sqlQuery, MpaStorage::mapRowToMpa);
     }
     @Override
-    public MPA getMpaById(int id) {
+    public MPA getMpaById(int id) {                                                          //Получаем МРА из БД по Id
         String sqlQuery = "select * from MPA where MPA_ID = ?";
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (!mpaRows.next()) {

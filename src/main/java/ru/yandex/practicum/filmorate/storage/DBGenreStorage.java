@@ -17,11 +17,11 @@ public class DBGenreStorage implements GenreStorage{
     }
     @Override
     public List<Genre> getAllGenres() {
-        String sqlQuery = "select * from GENRES";
+        String sqlQuery = "select * from GENRES";                                   //Получаем список всех жанров из БД
         return jdbcTemplate.query(sqlQuery, GenreStorage::mapRowToGenre);
     }
     @Override
-    public Genre getGenreById(int id) {
+    public Genre getGenreById(int id) {                                                     //Получаем жанр из БД по Id
         String sqlQuery = "select * from GENRES where GENRE_ID = ?";
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet(sqlQuery, id);
         if (!mpaRows.next()) {
