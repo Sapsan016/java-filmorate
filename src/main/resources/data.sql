@@ -7,11 +7,10 @@ values (3, 'Мультфильм');
 merge into GENRES(GENRE_ID,GENRE_NAME)
 values (4, 'Триллер');
 merge into GENRES(GENRE_ID,GENRE_NAME)
-values (5, 'Боевик');
+values (5, 'Документальный');
 merge into GENRES(GENRE_ID,GENRE_NAME)
-values (6, 'Фантастика');
-merge into GENRES(GENRE_ID,GENRE_NAME)
-values (7, 'Документальное');
+values (6, 'Боевик');
+
 
 merge into MPA(MPA_ID,MPA_NAME)
     values (1, 'G');
