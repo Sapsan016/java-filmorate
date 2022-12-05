@@ -1,5 +1,4 @@
 package ru.yandex.practicum.filmorate.storage;
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -15,28 +14,21 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
-
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
-
-
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Repository
 public class DBFilmStorage implements FilmStorage {
-
     JdbcTemplate jdbcTemplate;
-
     @Autowired
     public DBFilmStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
-
     @Override
     public Film getFilmById(int id) {                                                           //Возвращаем фильм по Id
         if (isPresent(id)) {
@@ -50,7 +42,6 @@ public class DBFilmStorage implements FilmStorage {
         }
         throw new FilmNotFoundException("Фильм не найден");
     }
-
     @Override
     public List<Film> getAllFilms() {                                               //Получаем список всех фильмов
         String sqlQuery = "select * from FILMS";
@@ -62,7 +53,6 @@ public class DBFilmStorage implements FilmStorage {
         }
         return films;
     }
-
     @Override
     public Film addFilm(@RequestBody Film film) {                                                    //Добавляем фильм
         if (validateFilm(film)) {                                               //Если фильм прошел валидацию добавляем
@@ -95,7 +85,6 @@ public class DBFilmStorage implements FilmStorage {
         film.setLikes(new ArrayList<>());                                                  //Добавляем новый список лайков
         return film;
     }
-
     @Override
     public Film updateFilm(@RequestBody Film film) throws ValidationException {                        //Обновляем фильм
         if (validateFilm(film) && isPresent(film.getId())) {       //Если фильм прошел валидацию и есть в базе обновляем
@@ -133,21 +122,18 @@ public class DBFilmStorage implements FilmStorage {
             throw new ValidationException("Валидация не прошла");
         }
     }
-
     @Override
     public Film addLike(int filmId, int userId) {                                                      //Добавляем лайк
         final String SQL = "INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
         jdbcTemplate.update(SQL, filmId, userId);
         return getFilmById(filmId);
     }
-
     @Override
     public Film removeLike(int filmId, int userId) {                                                     //Удаляем лайк
         final String SQL = "delete from FILM_LIKES where FILM_ID = ? and USER_ID = ?";
         jdbcTemplate.update(SQL, filmId, userId);
         return getFilmById(filmId);
     }
-
     @Override
     public void removeFilmById(int id) {                                                          //Удаляем фильм из БД
         if (!isPresent(id)) {
@@ -158,7 +144,6 @@ public class DBFilmStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery, id);
         log.info("Фильм с Id= " + id + " удален");
     }
-
     @Override
     public boolean validateFilm(Film film) {
         LocalDate firstFilm = LocalDate.of(1895, 12, 28);                     //День рождения кино
@@ -181,7 +166,6 @@ public class DBFilmStorage implements FilmStorage {
         }
         return true;
     }
-
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {      // Преобразуем запрос в фильм
         return Film.builder()
                 .id(resultSet.getInt("FILM_ID"))
@@ -191,7 +175,6 @@ public class DBFilmStorage implements FilmStorage {
                 .duration(resultSet.getInt("DURATION"))
                 .build();
     }
-
     private boolean isPresent(int id) {                                               //Проверяем наличие фильма в базе
         final String check = "SELECT * FROM FILMS WHERE FILM_ID = ?";
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(check, id);
@@ -201,7 +184,6 @@ public class DBFilmStorage implements FilmStorage {
         }
         return true;
     }
-
     private List<Genre> getGenresFromBD(int id) {                                        //Получаем список жанров из БД
         final String genreSQL = "SELECT GENRES.GENRE_ID, GENRE_NAME " +
                 "FROM GENRES " +
@@ -209,7 +191,6 @@ public class DBFilmStorage implements FilmStorage {
                 "WHERE FILM_ID = ?";
         return jdbcTemplate.query(genreSQL, GenreStorage::mapRowToGenre, id);
     }
-
     private MPA getMpaFromBD(int id) {                                                             //Получаем МРА из БД
         final String MPASQL = "SELECT MPA_ID, MPA_NAME " +
                 "FROM MPA " +
@@ -217,14 +198,12 @@ public class DBFilmStorage implements FilmStorage {
                 "WHERE film_id = ?";
         return jdbcTemplate.queryForObject(MPASQL, MpaStorage::mapRowToMpa, id);
     }
-
     private List<Integer> getLikesFromBD(int id) {                                        //Получаем список жанров из БД
         final String genreSQL = "SELECT USER_ID FROM FILM_LIKES " +
                 "WHERE FILM_ID = ?";
 
         return jdbcTemplate.query(genreSQL, this::mapRowToLikes, id);
     }
-
     private int mapRowToLikes(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в лайк
         return rs.getInt("USER_ID");
     }

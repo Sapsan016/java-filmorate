@@ -1,9 +1,10 @@
 Репозиторий проекта Filmorate
 
+Схема базы данных 
 
 <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="src/main/resources/FilmorateDB_diagramm.png">
-    <img src="src/main/resources/FilmorateDB_diagramm.png">
+    <source media="(prefers-color-scheme: dark)" srcset="src/main/resources/Diagram.png">
+    <img src="src/main/resources/Diagram.png">
 </picture>
 
 Примеры основных запросов
