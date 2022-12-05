@@ -33,8 +33,8 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
     @PostMapping()
-    public void addFilm(@RequestBody Film film) {                                         //Эндпойнт для добавление фильма
-        filmService.addFilm(film);
+    public Film addFilm(@RequestBody Film film) {                                         //Эндпойнт для добавление фильма
+       return filmService.addFilm(film);
     }
 
     @PutMapping()

@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,8 +33,8 @@ public class FilmService {
     public Film getFilmById(@PathVariable("id") int id){               //Передаем запрос на получение фильма в хранилище
         return filmStorage.getFilmById(id);
     }
-    public void addFilm(@RequestBody Film film) {                      //Передаем запрос на добавление фильмав в хранилище
-        filmStorage.addFilm(film);
+    public Film addFilm(@RequestBody Film film) {                      //Передаем запрос на добавление фильмав в хранилище
+        return filmStorage.addFilm(film);
     }
     public void updateFilm(@RequestBody Film film) throws ValidationException { //Передаем запрос на обновление фильма в хранилище
         filmStorage.updateFilm(film);

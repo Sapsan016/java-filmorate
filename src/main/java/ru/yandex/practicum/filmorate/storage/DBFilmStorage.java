@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -40,7 +41,7 @@ public class DBFilmStorage implements FilmStorage {
     public Film getFilmById(int id) {                                                           //Возвращаем фильм по Id
         if (isPresent(id)) {
             String sqlQuery = "select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION " +
-                     "from FILMS where FILM_ID = ?";
+                    "from FILMS where FILM_ID = ?";
             Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
             film.setMpa(getMpaFromBD(id));         //Задаем фильму МРА,список жанров и лайков сохраненные в БД
             film.setGenres(getGenresFromBD(id));
@@ -54,7 +55,7 @@ public class DBFilmStorage implements FilmStorage {
     public List<Film> getAllFilms() {                                               //Получаем список всех фильмов
         String sqlQuery = "select * from FILMS";
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
-        for(Film film : films) {
+        for (Film film : films) {
             film.setMpa(getMpaFromBD(film.getId()));         //Задаем фильму МРА,список жанров и лайков сохраненные в БД
             film.setGenres(getGenresFromBD(film.getId()));
             film.setLikes(getLikesFromBD(film.getId()));
@@ -91,8 +92,7 @@ public class DBFilmStorage implements FilmStorage {
         }
         film.setMpa(getMpaFromBD(film.getId()));                    //Задаем фильму МРА и список жанров сохраненные в БД
         film.setGenres(getGenresFromBD(film.getId()));
-        film.setLikes(new ArrayList<>() {
-        });                                                  //Добавляем новый список лайков
+        film.setLikes(new ArrayList<>());                                                  //Добавляем новый список лайков
         return film;
     }
 
@@ -110,17 +110,24 @@ public class DBFilmStorage implements FilmStorage {
                     , film.getDuration()
                     , film.getMpa().getId()
                     , film.getId());
-            if (film.getGenres() != null) {
-                final String genreQuery = "update  FILMS_GENRE set GENRE_ID = ? WHERE FILM_ID = ?";
-                for (Genre g : film.getGenres()) {
-                    jdbcTemplate.update(genreQuery, g.getId(), film.getId());
+            if (film.getGenres() != null) {                                                  //Обновляем список данных
+                final String delGenres = "delete from FILMS_GENRE where FILM_ID = ?";
+                final String updGenres = "insert into FILMS_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
+                jdbcTemplate.update(delGenres, film.getId());
+                for (Genre g : film.getGenres()) {                                             //Проверяем на дубликаты
+                    String findDuplicate = "select * from FILMS_GENRE where FILM_ID = ? AND GENRE_ID = ?";
+                    SqlRowSet checkRows = jdbcTemplate.queryForRowSet(findDuplicate, film.getId(), g.getId());
+                    if (!checkRows.next()) {
+                        jdbcTemplate.update(updGenres, film.getId(), g.getId());
+                    }
                 }
             }
             log.info("Фильм с Id= " + film.getId() + " обновлен");
             film.setLikes(temp);
-            film.setMpa(getMpaFromBD(film.getId()));                    //Задаем фильму МРА и список жанров сохраненные в БД
+            film.setMpa(getMpaFromBD(film.getId()));               //Задаем фильму МРА и список жанров сохраненные в БД
             film.setGenres(getGenresFromBD(film.getId()));
             return film;
+
         } else {
             log.error("Валидация не прошла");
             throw new ValidationException("Валидация не прошла");
@@ -184,6 +191,7 @@ public class DBFilmStorage implements FilmStorage {
                 .duration(resultSet.getInt("DURATION"))
                 .build();
     }
+
     private boolean isPresent(int id) {                                               //Проверяем наличие фильма в базе
         final String check = "SELECT * FROM FILMS WHERE FILM_ID = ?";
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(check, id);
@@ -209,12 +217,14 @@ public class DBFilmStorage implements FilmStorage {
                 "WHERE film_id = ?";
         return jdbcTemplate.queryForObject(MPASQL, MpaStorage::mapRowToMpa, id);
     }
+
     private List<Integer> getLikesFromBD(int id) {                                        //Получаем список жанров из БД
         final String genreSQL = "SELECT USER_ID FROM FILM_LIKES " +
-                                 "WHERE FILM_ID = ?";
+                "WHERE FILM_ID = ?";
 
         return jdbcTemplate.query(genreSQL, this::mapRowToLikes, id);
     }
+
     private int mapRowToLikes(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в лайк
         return rs.getInt("USER_ID");
     }
