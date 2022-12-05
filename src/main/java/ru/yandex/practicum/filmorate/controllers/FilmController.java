@@ -14,10 +14,10 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/films")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FilmController {
 
-    final FilmService filmService;
+    FilmService filmService;
     @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;

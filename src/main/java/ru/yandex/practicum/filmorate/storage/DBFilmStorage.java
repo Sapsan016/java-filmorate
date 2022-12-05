@@ -184,12 +184,6 @@ public class DBFilmStorage implements FilmStorage {
                 .duration(resultSet.getInt("DURATION"))
                 .build();
     }
-    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {            // Преобразуем запрос в жанр
-        final int id = rs.getInt("GENRE_ID");
-        final String name = rs.getString("GENRE_NAME");
-        return new Genre(id, name);
-    }
-
     private boolean isPresent(int id) {                                               //Проверяем наличие фильма в базе
         final String check = "SELECT * FROM FILMS WHERE FILM_ID = ?";
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(check, id);
@@ -205,7 +199,7 @@ public class DBFilmStorage implements FilmStorage {
                 "FROM GENRES " +
                 "JOIN FILMS_GENRE FG on GENRES.GENRE_ID = FG.GENRE_ID " +
                 "WHERE FILM_ID = ?";
-        return jdbcTemplate.query(genreSQL, this::mapRowToGenre, id);
+        return jdbcTemplate.query(genreSQL, GenreStorage::mapRowToGenre, id);
     }
 
     private MPA getMpaFromBD(int id) {                                                             //Получаем МРА из БД

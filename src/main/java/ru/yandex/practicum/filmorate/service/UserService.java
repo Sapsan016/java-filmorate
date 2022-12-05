@@ -65,9 +65,9 @@ public class UserService {
             log.error("Пользователь не найден");
             throw new UserNotFoundException("Пользователь не найден");
         }
-        List<Integer> listOfIds = userStorage.getFriendIdsFromBD(userId);
+        List<Integer> listOfIds = userStorage.getFriendIdsFromBD(userId);                           //Получаем список Id
         List<User> friendsList = new ArrayList<>();
-        for(Integer id : listOfIds) {
+        for(Integer id : listOfIds) {                                                    //Добавляем пользователей по Id
             friendsList.add(userStorage.getUserById(id));
         }
         log.info("У пользователя с Id= " + userId + " список друзей:" + friendsList);
