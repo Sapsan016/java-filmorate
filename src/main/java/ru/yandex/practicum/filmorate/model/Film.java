@@ -21,17 +21,5 @@ public class Film {
     MPA mpa;                         //Рейтинг фильма
     List<Genre> genres;              //Жанры фильма
 
-    @Override
-    public String toString() {
-        return "Film{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", releaseDate=" + releaseDate +
-                ", duration=" + duration +
-                ", likes=" + likes +
-                ", mpa=" + mpa +
-                ", genres=" + genres +
-                '}';
+
     }
-}
