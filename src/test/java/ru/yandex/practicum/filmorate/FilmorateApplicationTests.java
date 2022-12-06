@@ -3,10 +3,6 @@ package ru.yandex.practicum.filmorate;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -15,11 +11,11 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.MotionCompany;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.MotionCompanyStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
@@ -37,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmorateApplicationTests {
     UserStorage userStorage;
     FilmStorage filmStorage;
-    MpaStorage mpaStorage;
+    MotionCompanyStorage motionCompanyStorage;
     GenreStorage genreStorage;
     List<Genre> genres = new ArrayList<>();
 
@@ -47,13 +43,13 @@ class FilmorateApplicationTests {
             LocalDate.of(2000, 02, 01), new ArrayList<>());
     User testUser2 = new User(0, "testUser2@ya.ru", "User2", "u2",
             LocalDate.of(2001, 01, 01), new ArrayList<>());
-    MPA mpa = new MPA(1, "G");
-    MPA mpa2 = new MPA(2, "PG");
+    MotionCompany motionCompany = new MotionCompany(1, "G");
+    MotionCompany motionCompany2 = new MotionCompany(2, "PG");
     Genre genre = new Genre(1, "Комедия");
     Film testFilm1 = new Film(0, "Film1", "It's test film 1", LocalDate.of(2001, 01, 01),
-            100, new ArrayList<>(), mpa, genres);
+            100, new ArrayList<>(), motionCompany, genres);
     Film updateTestFilm1 = new Film(1, "UpdFilm1", "It's test film 1 update", LocalDate.of(2000, 01, 01),
-            150, new ArrayList<>(), mpa2, genres);
+            150, new ArrayList<>(), motionCompany2, genres);
     @Test
     public void testFindAndUpdateUserById() {
         userStorage.createUser(testUser1);
@@ -118,7 +114,7 @@ class FilmorateApplicationTests {
         assertEquals(LocalDate.of(2001, 01, 01), film.getReleaseDate());
         assertEquals(100, film.getDuration());
         assertEquals(0, film.getLikes().size());
-        assertEquals(mpa.getId(), film.getMpa().getId());
+        assertEquals(motionCompany.getId(), film.getMpa().getId());
         assertEquals(0, film.getGenres().size());
         genres.add(genre);
         filmStorage.updateFilm(updateTestFilm1);
@@ -128,7 +124,7 @@ class FilmorateApplicationTests {
         assertEquals("It's test film 1 update", film.getDescription());
         assertEquals(LocalDate.of(2000, 01, 01), film.getReleaseDate());
         assertEquals(150, film.getDuration());
-        assertEquals(mpa2.getId(), film.getMpa().getId());
+        assertEquals(motionCompany2.getId(), film.getMpa().getId());
         assertEquals("Комедия", film.getGenres().get(0).getName());
     }
     @Test
@@ -161,11 +157,11 @@ class FilmorateApplicationTests {
 
     @Test
     public void testGetAllMpa() {
-        assertEquals(5, mpaStorage.getAllMpa().size());
+        assertEquals(5, motionCompanyStorage.getAllMpa().size());
     }
     @Test
     public void testGetMpaById() {
-        assertEquals("G", mpaStorage.getMpaById(1).getName());
+        assertEquals("G", motionCompanyStorage.getMpaById(1).getName());
     }
     @Test
     public void testGetAllGenres() {

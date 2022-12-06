@@ -9,17 +9,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level= AccessLevel.PRIVATE)
-public class MPA {
+public class MotionCompany {
 
     int id;
 
     String name;
 
-    @Override
-    public String toString() {
-        return "MPA{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
+
 }

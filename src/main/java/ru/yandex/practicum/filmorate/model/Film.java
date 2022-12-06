@@ -3,7 +3,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -17,8 +16,8 @@ public class Film {
     String description;
     LocalDate releaseDate;
     int duration;
-    List<Integer> likes;               //Список id пользователей поставивших лайк фильму
-    MPA mpa;                         //Рейтинг фильма
+    List<Integer> likes;              //Список id пользователей поставивших лайк фильму
+    MotionCompany mpa;                         //Рейтинг фильма
     List<Genre> genres;              //Жанры фильма
 
 

@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping("/films")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FilmController {
+
     FilmService filmService;
     @Autowired
     public FilmController(FilmService filmService) {
@@ -24,7 +25,7 @@ public class FilmController {
         return filmService.getAllFilms();
     }
     @GetMapping("/{id}")                                                        //Эндпойнт для получение фильма по Id
-    public Film getFilmById(@PathVariable("id") int id){
+    public Film getFilmById(@PathVariable int id){
         return filmService.getFilmById(id);
     }
     @PostMapping()

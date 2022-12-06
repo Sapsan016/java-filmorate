@@ -25,7 +25,7 @@ public class ErrorHandler {
     }
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)                                            //Обработка ошибки МРА не найден
-    public ErrorResponse mpaNotFoundException (final MpaNotFoundException e){
+    public ErrorResponse mpaNotFoundException (final MotionCompanyNotFoundException e){
         return new ErrorResponse(e.getMessage()
         );
     }

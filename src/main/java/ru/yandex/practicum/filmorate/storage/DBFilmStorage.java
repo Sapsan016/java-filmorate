@@ -13,7 +13,8 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.MotionCompany;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -191,12 +192,12 @@ public class DBFilmStorage implements FilmStorage {
                 "where FILM_ID = ?";
         return jdbcTemplate.query(genreSQL, GenreStorage::mapRowToGenre, id);
     }
-    private MPA getMpaFromBD(int id) {                                                             //Получаем МРА из БД
+    private MotionCompany getMpaFromBD(int id) {                                                             //Получаем МРА из БД
         final String MPASQL = "select MPA_ID, MPA_NAME " +
                 "from MPA " +
                 "join FILMS F ON MPA.MPA_ID = F.RATING " +
                 "where film_id = ?";
-        return jdbcTemplate.queryForObject(MPASQL, MpaStorage::mapRowToMpa, id);
+        return jdbcTemplate.queryForObject(MPASQL, MotionCompanyStorage::mapRowToMpa, id);
     }
     private List<Integer> getLikesFromBD(int id) {                                        //Получаем список жанров из БД
         final String genreSQL = "select USER_ID from FILM_LIKES " +
