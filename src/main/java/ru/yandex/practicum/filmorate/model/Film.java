@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level= AccessLevel.PRIVATE)
 public class Film {
@@ -16,5 +16,9 @@ public class Film {
     String description;
     LocalDate releaseDate;
     int duration;
-    Set<Integer> likes;
-}
+    List<Integer> likes;              //Список id пользователей поставивших лайк фильму
+    MotionCompany mpa;                         //Рейтинг фильма
+    List<Genre> genres;              //Жанры фильма
+
+
+    }

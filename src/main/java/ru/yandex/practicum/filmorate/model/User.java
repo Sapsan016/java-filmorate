@@ -1,19 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @FieldDefaults(level= AccessLevel.PRIVATE)
+@Builder
 public class User {
     int id;
     @NotBlank                                             //Проверка email на пустую строку, null и соответствие формату
@@ -27,5 +28,6 @@ public class User {
     @NotNull                                                                      //Проверка на заполнение даты рождения
     LocalDate birthday;
 
-    Set<Integer> friendsIds;                                                               //Поле для хранения Id друзей
+    List<Integer> friendsIds;                                                               //Поле для хранения Id друзей
+
 }

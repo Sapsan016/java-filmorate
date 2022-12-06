@@ -1,35 +1,57 @@
 Репозиторий проекта Filmorate
 
+Схема базы данных 
 
 <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="src/main/resources/FilmorateDB_diagramm.png">
-    <img src="src/main/resources/FilmorateDB_diagramm.png">
+    <source media="(prefers-color-scheme: dark)" srcset="src/main/resources/Diagram.png">
+    <img src="src/main/resources/Diagram.png">
 </picture>
 
 Примеры основных запросов
+select * from USERS where USER_ID = ?
 
-INSERT INTO users (user_name, email, birthday, login)
-VALUES ('Inan Inanov', 'ivanov1@gmail.com', 'iivan);
+select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY from USERS
 
-SELECT user_name FROM users WHERE id = 1;
+insert into USERS (EMAIL, USER_NAME, LOGIN, BIRTHDAY) values (?, ?, ?, ?)";
 
-SELECT friend_id FROM user_friends WHERE user_id = 1 AND status = 'true';
+update USERS set EMAIL = ?, USER_NAME = ?, LOGIN = ?, BIRTHDAY = ? where USER_ID = ?";
 
-INSERT INTO user_friends (user_id, friend_id, status)
-VALUES (1, 2, true);
+delete from USERS where USER_ID = ?
 
-UPDATE user_friends SET status = 'false' WHERE friend_id = 2;
+insert into FRIENDS (USER_ID, FRIEND_ID, STATUS) values (?, ?, ?)
 
-DELETE FROM users WHERE id = 1;
+delete from FRIENDS where USER_ID = ? and FRIEND_ID = ?
 
-INSERT INTO films (film_name, description, release_date, duration, rating)
-VALUES ('Film1', 'New film', '2000-01-01', 200, 'G');
+select FRIEND_ID from FRIENDS where USER_ID = ?
 
-SELECT film_name FROM users WHERE id = 1;
+select FILM_ID, FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION from FILMS where FILM_ID = ?
 
-INSERT INTO film_likes (film_id, user_id)
-VALUES (1, 2);
+select * from FILMS
 
-SELECT COUNT(user_id) FROM film_likes WHERE film_id = 1;
+insert into FILMS (FILM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING) values (?, ?, ?, ?, ?)
+insert into FILMS_GENRE (FILM_ID, GENRE_ID) values (?, ?)
 
-DELETE FROM films WHERE id = 1;
+update FILMS set FILM_NAME = ?, DESCRIPTION = ?, RELEASE_DATE = ?, DURATION = ?, RATING = ? where FILM_ID = ?
+delete from FILMS_GENRE where FILM_ID = ?
+insert into FILMS_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)
+select * from FILMS_GENRE where FILM_ID = ? AND GENRE_ID = ?
+
+insert into FILM_LIKES (FILM_ID, USER_ID) values (?, ?)
+
+delete from FILM_LIKES where FILM_ID = ? and USER_ID = ?
+
+delete from FILMS where FILM_ID = ?
+
+select GENRES.GENRE_ID, GENRE_NAME from GENRES join FILMS_GENRE FG on GENRES.GENRE_ID = FG.GENRE_ID where FILM_ID = ?
+
+select MPA_ID, MPA_NAME from MPA join FILMS F ON MPA.MPA_ID = F.RATING where film_id = ?
+
+select USER_ID from FILM_LIKES where FILM_ID = ?
+
+select * from GENRES
+
+select * from GENRES where GENRE_ID = ?
+
+select * from MPA
+
+select * from MPA where MPA_ID = ?

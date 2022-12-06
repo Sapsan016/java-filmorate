@@ -26,46 +26,46 @@ public class UserController {
     }
 
     @GetMapping()
-    public ArrayList<User> getAllUsers() {                               //Запрос на получение списка всех пользователей
+    public List<User> getAllUsers() {                               //Эндпойнт для получение списка всех пользователей
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{id}")                                                     //запрос на получение пользователя по Id
+    @GetMapping("/{id}")                                                     //Эндпойнт для получение пользователя по Id
     public User getUserById(@PathVariable("id") int id) {
         return userService.getUserById(id);
     }
 
-    @PutMapping()                                                                 //Запрос на обновление пользователя
+    @PutMapping()                                                                 //Эндпойнт для обновление пользователя
     public User updateUser(@Valid @RequestBody User user) throws ValidationException {
         return userService.updateUser(user);
     }
 
     @PostMapping()
-    public User createUser(@Valid @RequestBody User user) {                            //Запрос на создание пользователя
+    public User createUser(@Valid @RequestBody User user) {                         //Эндпойнт для создание пользователя
         return userService.createUser(user);
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")                                                      //Эндпойнт для удаления пользователя
     public void deleteUserById(@PathVariable("id") int id){
         userService.deleteUserById(id);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")                                           //запрос на добавление в друзья
+    @PutMapping("/{id}/friends/{friendId}")                                        //Эндпойнт для добавление в друзья
     public void addFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
         userService.addFriend(userId, friendId);
 
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")                                         //запрос на удаление из друзей
+    @DeleteMapping("/{id}/friends/{friendId}")                                      //Эндпойнт для удаление из друзей
     public void removeFriend(@PathVariable("id") int userId, @PathVariable("friendId") int friendId) {
         userService.removeFriend(userId, friendId);
     }
 
-    @GetMapping("/{id}/friends")                                             //Запрос на получение списка всех друзей
+    @GetMapping("/{id}/friends")                                          //Эндпойнт для получение списка всех друзей
     public List<User> getFriendsList(@PathVariable("id") int userId) {
         return userService.getFriendsList(userId);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")                           //запрос на получение списка общих друзей
+    @GetMapping("/{id}/friends/common/{otherId}")                        //Эндпойнт для получение списка общих друзей
     public List<User> getCommonFriendsList(@PathVariable("id") int userId, @PathVariable("otherId") int otherId) {
         return userService.getCommonFriendsList(userId, otherId);
     }

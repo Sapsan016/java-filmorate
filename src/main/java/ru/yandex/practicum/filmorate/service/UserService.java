@@ -23,12 +23,13 @@ import java.util.stream.Collectors;
 public class UserService {
     UserStorage userStorage;
 
+
     @Autowired
     public UserService(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
-    public ArrayList<User> getAllUsers() {          //Передаем запрос на получение списка всех пользователей в хранилище
+    public List<User> getAllUsers() {          //Передаем запрос на получение списка всех пользователей в хранилище
         return userStorage.getAllUsers();
     }
 
@@ -36,7 +37,7 @@ public class UserService {
         return userStorage.getUserById(id);
     }
 
-    public User createUser(@Valid @RequestBody User user) {       //Передаем Запрос на создание пользователя в хранилище
+    public User createUser(@Valid @RequestBody User user) {       //Передаем запрос на создание пользователя в хранилище
         return userStorage.createUser(user);
     }
 
@@ -49,39 +50,26 @@ public class UserService {
     }
 
     public void addFriend(int userId, int friendId) {                                              //добавление в друзья
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (user == null || friend == null) {
-            log.error("Пользователь не найден");
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-        user.getFriendsIds().add(friendId);                                  //Добавляем Id пользователей в списки друзей
-        friend.getFriendsIds().add(userId);
-        log.info("Пользователи с Id = " + userId + " и Id = " + friendId + " теперь друзья");
+        userStorage.addFriend(userId, friendId);
+        log.info("Пользователь с Id = {} добавил пользователя с Id = {}  в друзья", userId, friendId);
     }
 
     public void removeFriend(int userId, int friendId) {                                            //удаление из друзей
-        User user = userStorage.getUserById(userId);
-        User friend = userStorage.getUserById(friendId);
-        if (user == null || friend == null) {
-            log.error("Пользователь не найден");
-            throw new UserNotFoundException("Пользователь не найден");
-        }
-        user.getFriendsIds().remove(friendId);                         //Удаляем Id пользователей в обоих списках друзей
-        friend.getFriendsIds().remove(userId);
-        log.info("Пользователи с Id = " + userId + " и Id = " + friendId + " больше не друзья");
+        userStorage.removeFriend(userId,friendId);
+        log.info("Пользователь с Id = {} удалил пользователя с Id = {} из друзей", userId, friendId);
     }
 
-    public List<User> getFriendsList(int userId) {                                     //вывод списка друзей пользователя
+    public List<User> getFriendsList(int userId) {                                    //вывод списка друзей пользователя
         User user = userStorage.getUserById(userId);
         if (user == null) {
             log.error("Пользователь не найден");
             throw new UserNotFoundException("Пользователь не найден");
         }
-        List<User> friendsList = user.getFriendsIds()
-                .stream()
-                .map(userStorage::getUserById)
-                .collect(Collectors.toList());
+        List<Integer> listOfIds = userStorage.getFriendIdsFromBD(userId);                           //Получаем список Id
+        List<User> friendsList = new ArrayList<>();
+        for(Integer id : listOfIds) {                                                    //Добавляем пользователей по Id
+            friendsList.add(userStorage.getUserById(id));
+        }
         log.info("У пользователя с Id= " + userId + " список друзей:" + friendsList);
         return friendsList;
     }
