@@ -1,5 +1,10 @@
 Репозиторий проекта Filmorate
 
+Проект помогает пользователю выбрать филь для просмотра на основе оценок, поставленных друзьями уже посмотревшими этот фильм
+
+Java 11, Spring Boot, H2, REST, Lombok, Spring Data JPA, JUnit
+
+В дальнейшем проект Filmorаte был улучшен в сотрудничестве с одногрупниками в рамках совместного группового проекта.
 Схема базы данных 
 
 <picture>
@@ -8,6 +13,7 @@
 </picture>
 
 Примеры основных запросов
+
 select * from USERS where USER_ID = ?
 
 select USER_ID, EMAIL, USER_NAME, LOGIN, BIRTHDAY from USERS
